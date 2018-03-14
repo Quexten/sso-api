@@ -1,0 +1,38 @@
+{
+	"name": "quexten-sso-api",
+	"version": "1.0.0",
+	"license": "ISC",
+	"author": "Quexten",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node index.js"
+	},
+	"dependencies": {
+		"compose-next": "^1.1.1",
+		"cookie-parser": "^1.4.3",
+		"cors": "^2.8.3",
+		"express": "^4.16.2",
+		"graphql": "^0.11.7",
+		"graphql-server-express": "^1.2.0",
+		"graphql-tag": "^2.5.0",
+		"graphql-tools": "^2.10.0",
+		"mailcomposer": "^4.0.2",
+		"mailgun-js": "^0.13.1",
+		"mongodb": "^2.2.33",
+		"next": "^4.1.4",
+		"ooth": "^1.1.0",
+		"ooth-client": "^1.1.0",
+		"ooth-client-react": "^1.1.0",
+		"ooth-client-react-next": "^1.1.1",
+		"ooth-client-react-next-apollo": "^1.1.1",
+		"ooth-facebook": "^1.1.0",
+		"ooth-google": "^1.1.0",
+		"ooth-local": "^1.1.0",
+		"ooth-mongo": "^1.1.0",
+		"react": "^16.1.1",
+		"react-apollo": "^2.0.1",
+		"react-dom": "^16.1.1",
+		"staart": "2.0.0"
+	}
+}
