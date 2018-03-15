@@ -1,6 +1,6 @@
 const next = require('next')
 const express = require('express')
-const settings = require('./settings')
+const settings = require('./settings/settings.js')
 const api = require("./api")
 
 const dev = process.env.NODE_ENV !== 'prod'
