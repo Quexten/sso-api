@@ -30,6 +30,7 @@
 		"ooth-google": "^1.1.0",
 		"ooth-local": "^1.1.0",
 		"ooth-mongo": "^1.1.0",
+		"ooth-profile": "^1.4.0",
 		"react": "^16.1.1",
 		"react-apollo": "^2.0.1",
 		"react-dom": "^16.1.1",

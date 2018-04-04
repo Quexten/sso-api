@@ -7,7 +7,21 @@ const mail = require('./mail')
 const {MongoClient, ObjectId} = require('mongodb')
 const OothMongo = require('ooth-mongo')
 
+const oothEmail = require('./email.js')
+const oothProfile = require('ooth-profile')
+
+
+const fs = require("fs")
+var emailLogin = fs.readFileSync("./mails/emailLogin.html", "utf8")
+var passwordReset = fs.readFileSync("./mails/passwordReset.html", "utf8")
+var signup = fs.readFileSync("./mails/signup.html", "utf8")
+var verifyEmail = fs.readFileSync("./mails/verifyEmail.html", "utf8")
+var verifyEmailConfirmation = fs.readFileSync("./mails/verifyEmailConfirmation.html", "utf8")
+var settings = ''
+
 module.exports = async function start(app, settings) {
+    this.settings = settings
+    this.sendMail = mail(settings.mailgun)
 
     const ooth = new Ooth({
         sharedSecret: settings.sharedSecret,
@@ -18,82 +32,28 @@ module.exports = async function start(app, settings) {
     const oothMongo = new OothMongo(db, ObjectId)
 
     await ooth.start(app, oothMongo)
-
-    const sendMail = mail(settings.mailgun)
-    ooth.use('local', oothLocal({
-        onRegister({email, verificationToken, _id}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Welcome',
-                body: `Thank you for joining!`,
-                html: `Thank you for joining!`,
-            })
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Verify your email address',
-                body: `Please verify your email by opening the following url: ${settings.originUrl}/verify-email?token=${verificationToken}&userId=${_id}.`,
-                html: `Please verify your email by opening the following url: ${settings.originUrl}/verify-email?token=${verificationToken}&userId=${_id}.`,
-            })
-        },
-        onGenerateVerificationToken({email, verificationToken, _id}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Verify your email address',
-                body: `Please verify your email by opening the following url: ${settings.originUrl}/verify-email?token=${verificationToken}&userId=${_id}.`,
-                html: `Please verify your email by opening the following url: ${settings.originUrl}/verify-email?token=${verificationToken}&userId=${_id}.`,
-            })
-        },
-        onSetEmail({email, verificationToken, _id}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Verify your email address',
-                body: `Please verify your email by opening the following url: ${settings.originUrl}/verify-email?token=${verificationToken}&userId=${_id}.`,
-                html: `Please verify your email by opening the following url: ${settings.originUrl}/verify-email?token=${verificationToken}&userId=${_id}.`,
-            })
-        },
-        onVerify({email}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Address verified',
-                body: `Your email address has been verified.`,
-                html: `Your email address has been verified.`,
-            })
-        },
-        onForgotPassword({email, passwordResetToken, _id}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Reset password',
-                body: `Reset your password on the following page: ${settings.originUrl}/reset-password?token=${passwordResetToken}&userId=${_id}.`,
-                html: `Reset your password on the following page: ${settings.originUrl}/reset-password?token=${passwordResetToken}&userId=${_id}.`,
-            })
-        },
-        onResetPassword({email}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Password has been reset',
-                body: 'Your password has been reset.',
-                html: 'Your password has been reset.'
-            })
-        },
-        onChangePassword({email}) {
-            sendMail({
-                from: settings.mail.from,
-                to: email,
-                subject: 'Password has been changed',
-                body: 'Your password has been changed.',
-                html: 'Your password has been changed.'
-            })
+    ooth.use('profile', oothProfile({
+      fields: {
+        username: {
+          validate(value, user) {
+            if (!/^([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-]+)$/.test(value))
+              throw new Error(`Only alphanumeric, and - _ are allowed.`)
+            if (value.length > 25)
+              throw new Errror('Max allowed length is 25 characters.')
+          }
         }
+      }
     }))
-
     ooth.use('facebook', oothFacebook(settings.facebook))
-
     ooth.use('google', oothGoogle(settings.google))
+    ooth.use('email', oothEmail(function (id, email, loginToken) {
+      const emailLoginLink = settings.originUrl + "/login-email-confirmation?token=" + loginToken + "&userId=" + id
+      sendMail({
+        from: settings.mail.from,
+        to: email,
+        subject: 'Email Login',
+        body: 'Login with:' + emailLoginLink,
+        html: emailLogin.replace(/REPLACELINK/g, emailLoginLink)
+      })
+    }))
 }

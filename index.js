@@ -5,6 +5,11 @@ const api = require("./api")
 
 const dev = process.env.NODE_ENV !== 'prod'
 
+
+const mailcomposer = require('mailcomposer')
+const Mg = require('mailgun-js')
+const fs = require("fs")
+
 const start = async () => {
     try {
         const app = express()
