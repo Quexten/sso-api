@@ -9,14 +9,11 @@ const OothMongo = require('ooth-mongo')
 
 const oothEmail = require('./email.js')
 const oothProfile = require('ooth-profile')
+const md5 = require('js-md5');
 
 
 const fs = require("fs")
 var emailLogin = fs.readFileSync("./mails/emailLogin.html", "utf8")
-var passwordReset = fs.readFileSync("./mails/passwordReset.html", "utf8")
-var signup = fs.readFileSync("./mails/signup.html", "utf8")
-var verifyEmail = fs.readFileSync("./mails/verifyEmail.html", "utf8")
-var verifyEmailConfirmation = fs.readFileSync("./mails/verifyEmailConfirmation.html", "utf8")
 var settings = ''
 
 module.exports = async function start(app, settings) {
@@ -41,13 +38,23 @@ module.exports = async function start(app, settings) {
             if (value.length > 25)
               throw new Errror('Max allowed length is 25 characters.')
           }
+        },
+        avatar: {
+          validate(value, user) {
+            if (!(value === 'Google' || value === 'Facebook' || value === 'Email')) {
+              throw new Error('Unavailable avatar selected')
+            }
+            if (user[value.toLowerCase()] == null) {
+              throw new Error('User does not have the selected avatars authentication method')
+            }
+          }
         }
       }
     }))
     ooth.use('facebook', oothFacebook(settings.facebook))
     ooth.use('google', oothGoogle(settings.google))
     ooth.use('email', oothEmail(function (id, email, loginToken) {
-      const emailLoginLink = settings.originUrl + "/login-email-confirmation?token=" + loginToken + "&userId=" + id
+      const emailLoginLink = settings.originUrl + "/#/login-email-confirmation?token=" + loginToken + "&userId=" + id
       sendMail({
         from: settings.mail.from,
         to: email,
@@ -56,4 +63,29 @@ module.exports = async function start(app, settings) {
         html: emailLogin.replace(/REPLACELINK/g, emailLoginLink)
       })
     }))
+
+    app.get('/profile/:id', (req, res) => {
+      const id = req.params.id
+      oothMongo.getUserById(id).then(user => {
+        const timestamp = user._id.toString().substring(0,8)
+        const created =  new Date( parseInt( timestamp, 16 ) * 1000 )
+        const username = ('profile' in user) ? user.profile.username : null
+        const avatar = ('profile' in user) ? user.profile.avatar : null
+        var avatarUri = null
+        if (avatar != null) {
+          if (avatar == 'Email') {
+            avatarUri = 'https://www.gravatar.com/avatar/' + md5(user.email.email.toLowerCase().trim())
+          } else if (avatar == 'Google') {
+            avatarUri = 'https://pikmail.herokuapp.com/' + user.google.email + '?size=200'
+          } else if (avatar == 'Facebook') {
+            avatarUri = 'https://graph.facebook.com/' + user.facebook.id + '/picture?type=large'
+          }
+        }
+        res.send({
+          username,
+          avatar: avatarUri,
+          created
+        })
+      })
+    })
 }
