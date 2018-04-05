@@ -87,5 +87,10 @@ module.exports = async function start(app, settings) {
           created
         })
       })
+      .catch({
+        res.send({
+          error: "User does not exists."
+        })
+      })
     })
 }
