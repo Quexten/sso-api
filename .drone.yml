@@ -1,5 +1,5 @@
 pipeline:
   docker:
     image: plugins/docker
-    repo:quexten/sso-api
+    repo: quexten/sso-api
     tags: latest
