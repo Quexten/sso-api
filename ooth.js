@@ -1,6 +1,5 @@
 const express = require('express')
 const Ooth = require('ooth')
-const oothLocal = require('ooth-local')
 const oothFacebook = require('./oothFacebook.js')
 const oothGoogle = require('ooth-google')
 const mail = require('./mail')

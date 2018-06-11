@@ -1,4 +1,3 @@
-const next = require('next')
 const express = require('express')
 const settings = require('./settings/settings.js')
 const api = require("./api")
@@ -19,13 +18,6 @@ const start = async () => {
     		  next();
     		});
         await api.start(app, settings)
-
-        const nextApp = next({
-            dev
-        })
-        const handle = nextApp.getRequestHandler()
-
-        await nextApp.prepare()
 
         app.get('*', (req, res) => {
             console.log(req)
