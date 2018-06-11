@@ -3,3 +3,4 @@ pipeline:
     image: plugins/docker
     repo: quexten/sso-api
     tags: latest
+    secrets: [ docker_username, docker_password ]
