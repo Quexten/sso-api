@@ -23,5 +23,9 @@
 		"ooth-google": "^1.5.2",
 		"ooth-mongo": "^1.1.0",
 		"ooth-profile": "^1.4.0"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-preset-es2015": "^6.24.1"
 	}
 }
