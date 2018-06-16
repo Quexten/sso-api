@@ -1,0 +1,33 @@
+{
+  "name": "SSO-Api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "export NODE_ENV='development' && node ./node_modules/nodemon/bin/nodemon.js bootstrap.js",
+    "start": "node bootstrap.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "2fa": "^0.1.2",
+    "body-parser": "^1.16.1",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "express": "^4.14.1",
+    "express-session": "^1.15.1",
+    "express-useragent": "^1.0.12",
+    "jsonwebtoken": "^8.3.0",
+    "lodash": "^4.17.4",
+    "mongodb": "^3.0.10",
+    "passport": "^0.3.2",
+    "passport-custom": "^1.0.5",
+    "passport-facebook": "^2.1.1",
+    "passport-google-oauth20": "^1.0.0",
+    "uuid-token-generator": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
