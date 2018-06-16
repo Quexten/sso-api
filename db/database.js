@@ -16,9 +16,10 @@ module.exports = {
         }, callback);
     },
     findUserByAuthenticator: function(authType, id, callback) {
-        let providerPath = 'auth.primary.' + authType + '.id'
-        let query = {}
-        query[providerPath] = id
+        let query = {
+            'auth.primary.type': authType,
+            'auth.primary.id': id
+        }
         users.findOne(query, callback)
     },
     updateUser: function(id, values) {

@@ -1,12 +1,15 @@
 let jwt = require('jsonwebtoken')
-
+let express = require('express')
+let router = express.Router()
 
 let primaryAuthenticators = []
-primaryAuthenticators["mail"] = require("./mailAuthenticator")
+primaryAuthenticators["mail"] = require("./primary/mail")
 primaryAuthenticators["test"] = require("./primary/test")
 
 let secondaryAuthenticators = []
-prim
+secondaryAuthenticators["backup-codes"] = require("./secondary/codes")
+secondaryAuthenticators["totp"] = require("./secondary/totp")
+secondaryAuthenticators["u2f"] = require("./secondary/u2f")
 
 
 //Primary auth token, validates possesion of
@@ -26,9 +29,6 @@ function generatePrimaryAuthToken (userId, authType, authId) {
 module.exports = function (database) {
     let sessionGenerator = require('./sessionGenerator')(database)
 
-    const express = require('express')
-    const router = express.Router()
-
     router.get("/:authenticator/signin", (req, res) => {
         let authenticatorType = req.params.authenticator
         authenticators[authenticatorType](req, res, function (id, response) {
@@ -40,12 +40,24 @@ module.exports = function (database) {
             })
         })
     })
+
     router.get("/:authenticator/callback", (req, res) => {
         let authenticatorType = req.params.authenticator
-        let id = authenticators[authenticatorType].callback(req, res)
+        let id = primaryAuthenticators[authenticatorType].callback(req, res)
         //Id is established, might require a second factor of auth.
         database.findUserByAuthenticator(authenticatorType, id, (err, user) => {
+            if (user) {
+                let secondFactors = []
 
+                user.auth.secondary.forEach((factor) => {
+                    let factorId = factor.id
+                    secondFactors.push(factorId)
+                })
+
+                res.send({
+                    secondFactors: secondFactors
+                })
+            }
         })
     })
 

@@ -4,6 +4,6 @@ module.exports = {
     handleRequest: (req, res) => {
         tfa.generateBackupCodes(8, 'xxxx-xxxx-xxxx', function(err, codes) {
 
-        }
+        })
     }
 }

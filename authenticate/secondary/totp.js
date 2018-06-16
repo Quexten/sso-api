@@ -20,7 +20,4 @@ tfa.generateKey(32, function(err, key) {
         step: 30
     };
 
-    var code = tfa.generateCode(key, counter)
-    var validTOTP = tfa.verifyTOTP(key, code, opts)
-
 });
