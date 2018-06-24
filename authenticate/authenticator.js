@@ -6,11 +6,6 @@ let primaryAuthenticators = []
 primaryAuthenticators["mail"] = require("./primary/mail")
 primaryAuthenticators["test"] = require("./primary/test")
 
-let secondaryAuthenticators = []
-secondaryAuthenticators["backup-codes"] = require("./secondary/codes")
-secondaryAuthenticators["totp"] = require("./secondary/totp")
-secondaryAuthenticators["u2f"] = require("./secondary/u2f")
-
 
 //Primary auth token, validates possesion of
 //the primary factor, and can be exchanged for
@@ -21,6 +16,19 @@ function generatePrimaryAuthToken (userId, authType, authId) {
         data: {
             userId: userId,
             authType: authType,
+            grant: 'primary',
+            authId: authId
+        }
+    }, 'secret');
+}
+
+function generateSecondaryAuthToken (userId, authType, authId) {
+    return jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + (60 * 10),
+        data: {
+            userId: userId,
+            authType: authType,
+            grant: 'secondary',
             authId: authId
         }
     }, 'secret');
@@ -38,11 +46,20 @@ function validatePrimaryAuthToken (token) {
 function parsePrimaryAuthToken (token) {
     return jwt.decode(token)
 }
-
 module.exports = function (database) {
-    let sessionGenerator = require('./sessionGenerator')(database)
+    const express = require('express')
+    const router = express.Router()
 
-    router.get("/:authenticator/signin", (req, res) => {
+    router.use("/secondary", require("./secondary/router")(database))
+
+    return router
+}
+
+//module.exports = function (database) {
+
+ //   let sessionGenerator = require('./sessionGenerator')(database)
+
+    /*router.get(":authenticator/signin", (req, res) => {
         let authenticatorType = req.params.authenticator
         authenticators[authenticatorType](req, res, function (id, response) {
             //Id is established, might require a second factor of auth.
@@ -54,28 +71,26 @@ module.exports = function (database) {
         })
     })
 
-    router.get("/:authenticator/callback", (req, res) => {
+    router.get(":authenticator/create", (req, res) => {
         let authenticatorType = req.params.authenticator
-        let id = primaryAuthenticators[authenticatorType].callback(req, res)
-        //Id is established, might require a second factor of auth.
-        database.findUserByAuthenticator(authenticatorType, id, (err, user) => {
-            if (user) {
-                let secondFactors = []
-
-                user.auth.secondary.forEach((factor) => {
-                    let factorId = factor.id
-                    secondFactors.push(factorId)
-                })
-
-                res.send({
-                    secondFactors: secondFactors,
-                    primaryToken: generatePrimaryAuthToken(user._id, authenticatorType, id)
-                })
-            }
-        })
+        secondaryAuthenticators[authenticatorType].create(req, res)
+    })
+    router.get("test", (req, res) => {
+        res.send("ok")
     })
 
-    router.get("/:authenticator/exchangePrimaryToken", (req, res) => {
+    router.get("secondary/:authenticator/verify", (req, res) => {
+        let authenticatorType = req.params.authenticator
+        secondaryAuthenticators[authenticatorType].verify(req, res)
+    })
+    router.get("secondary/:authenticator/authenticate", (req, res) => {
+        let authenticatorType = req.params.authenticator
+        secondaryAuthenticators[authenticatorType].authenticate(req, res)
+    })
+
+
+
+    router.get(":authenticator/exchangePrimaryToken", (req, res) => {
         let authenticator = req.params.authenticator
         let primaryToken = req.query.primaryToken
         if(validatePrimaryAuthToken(primaryToken)) {
@@ -102,8 +117,8 @@ module.exports = function (database) {
             res.send("error")
         }
     })
+*/
 
-
-    return router
-}
+  //  return router
+//}
 

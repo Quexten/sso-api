@@ -1,23 +1,51 @@
-module.exports = function (request, response, callback) {
-    callback(true, response)
-}
+
 var tfa = require('2fa');
 
-tfa.generateKey(32, function(err, key) {
-    tfa.generateBackupCodes(8, 'xxxx-xxxx-xxxx', function(err, codes) {
-        // [ '7818-b7b8-c928', '3526-dc04-d3f2', 'be3c-5d9f-cb68', ... ]
+module.exports = {
 
-    })
+    create: (req, res, callback) => {
+        let user = req.user
+        tfa.generateKey(100, function(err, key) {
+            tfa.generateGoogleQR('Quexten', 'Quexten\nQuexten', key, function(err, qr) {
+                res.send({
+                    qr: qr,
+                    key: key
+                })
+                callback(user)
+            });
+        });
+    },
 
-    tfa.generateGoogleQR('Quexten', 'id', key, function(err, qr) {
+    verify: (req, res, callback) => {
+        let user = req.user
+        var opts = {
+            beforeDrift: 2,
+            afterDrift: 2,
+            step: 30
+        }
 
-    });
+        let isTokenValid = tfa.verifyTOTP(req.query.key, req.query.code, opts)
 
-    var opts = {
-        beforeDrift: 2,
-        afterDrift: 2,
-        drift: 4,
-        step: 30
-    };
+        res.send(isTokenValid)
 
-});
+        if(isTokenValid)
+        user.auth.secondary.push({
+            id: 'totp',
+            key: req.query.key
+        })
+        callback(user)
+    },
+
+    authenticate: (req, authData) => {
+        var opts = {
+            beforeDrift: 2,
+            afterDrift: 2,
+            step: 30
+        }
+
+        let isTokenValid = tfa.verifyTOTP(authData.key, req.query.code, opts)
+
+        return isTokenValid
+    }
+}
+

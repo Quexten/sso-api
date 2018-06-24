@@ -15,8 +15,7 @@ app.use(require('express-session')({
   resave: true, 
   saveUninitialized: true 
 }));
-app.use("/", require("./routes/router")(database))
+//app.use("/", require("./routes/router")(database))
 app.use("/authenticate", require("./authenticate/authenticator")(database))
-
 
 app.listen(3000)
