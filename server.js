@@ -3,7 +3,7 @@ const fs = require('fs');
 let app = express();
 
 let passport = require('passport')
-let database = require('./db/database')
+let database = require('./db/database')>
 
 app.use(require('cors')({
     origin: 'http://localhost:1024'

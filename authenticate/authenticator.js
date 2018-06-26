@@ -34,7 +34,7 @@ function generateSecondaryAuthToken (userId, authType, authId) {
     }, 'secret');
 }
 
-function validatePrimaryAuthToken (token) {
+function validateAuthToken (token) {
     try {
         jwt.verify(token, 'secret')
         return true
@@ -43,7 +43,7 @@ function validatePrimaryAuthToken (token) {
     }
 }
 
-function parsePrimaryAuthToken (token) {
+function parseAuthToken (token) {
     return jwt.decode(token)
 }
 module.exports = function (database) {
