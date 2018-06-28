@@ -7,16 +7,22 @@ secondaryAuthenticators["backup-codes"] = require("./codes")
 secondaryAuthenticators["totp"] = require("./totp")
 secondaryAuthenticators["u2f"] = require("./u2f")
 
-module.exports = function (database) {
+module.exports = (jwtHandler, database) => {
     router.get("/:authenticator/:method", (req, res, next) => {
         //Data contains jwt of user
-        let id = req.query.user
-        database.findUserById(id, (err, user) => {
-            if (user) {
-                req.user = user
-                next()
-            }
-        })
+        let primaryToken = req.headers['primary']
+        let token = jwtHandler.parseAuthToken(primaryToken)
+        let id = token.data.userId
+        try {
+            database.findUserById(id).then((user) => {
+                if (user) {
+                    req.user = user
+                    next()
+                }
+            })
+        } catch (err) {
+            console.log(err)
+        }
     })
     router.get("/:authenticator/create", (req, res) => {
         let authenticatorType = req.params.authenticator
@@ -38,12 +44,12 @@ module.exports = function (database) {
             if (authenticator.id === authenticatorType) {
                 let authAttempt = secondaryAuthenticators[authenticatorType].authenticate(req, authenticator)
                 if (authAttempt) {
+                    let jwtToken = jwtHandler.generateSecondaryAuthToken(req.user._id)
+                    res.set('secondaryToken', jwtToken)
                     res.send(true)
                 }
             }
         })
-
-        res.send(false)
     })
 
     return router

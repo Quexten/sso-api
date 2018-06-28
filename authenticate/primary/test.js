@@ -1,15 +1,9 @@
 module.exports = {
 
-    authenticate : function (id) {
-
-    },
-
-    callback : function (req, res) {
-        return req.query.user
-    },
-
-    getAvatar : function (id) {
-        return 'https://quexten.com/avatar_1920.png'
+    signIn: function (req, database, callback) {
+        database.findUserByAuthenticator('test', req.query.id, (error, user) => {
+            callback(user)
+        })
     }
 
 }

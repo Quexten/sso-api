@@ -1,19 +1,15 @@
-var tfa = require('2fa');
+let tfa = require('2fa');
+let { promisify } = require('es6-promisify')
+
+let generateBackupCodes = promisify(tfa.generateBackupCodes)
 
 module.exports = {
-
-    create: (req, res, callback) => {
-        let user = req.user
-        tfa.generateBackupCodes(8, 'xxxx-xxxx-xxxx', function(err, codes) {
-            res.send({
-                codes: codes
-            })
-            user.auth.secondary.push({
-                id: 'backup-codes',
-                codes: codes
-            })
-            callback(user)
-        })
+    create: async () => {
+        let codes = await generateBackupCodes(8, 'xxxx-xxxx-xxxx')
+        return {
+            id: 'backup-codes',
+            codes: codes
+        }
     },
 
     authenticate: (req, authData) => {

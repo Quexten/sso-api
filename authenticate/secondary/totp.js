@@ -1,39 +1,37 @@
-
-var tfa = require('2fa');
+const { promisify } = require('es6-promisify')
+const tfa = require('2fa');
+let generateKey = promisify(tfa.generateKey)
+let generateQr = promisify(tfa.generateGoogleQR)
 
 module.exports = {
+    create: async () => {
+        let key = await generateKey(100)
+        let qr = await generateQr('Quexten', 'Quexten\nQuexten', key)
 
-    create: (req, res, callback) => {
-        let user = req.user
-        tfa.generateKey(100, function(err, key) {
-            tfa.generateGoogleQR('Quexten', 'Quexten\nQuexten', key, function(err, qr) {
-                res.send({
-                    qr: qr,
-                    key: key
-                })
-                callback(user)
-            });
-        });
+        return {
+            qr: qr,
+            key: key
+        }
     },
 
-    verify: (req, res, callback) => {
+    verify: async (req, res) => {
         let user = req.user
-        var opts = {
+
+        let opts = {
             beforeDrift: 2,
             afterDrift: 2,
             step: 30
         }
-
         let isTokenValid = tfa.verifyTOTP(req.query.key, req.query.code, opts)
+        if(isTokenValid)
+            user.auth.secondary.push({
+                id: 'totp',
+                key: req.query.key
+            })
 
         res.send(isTokenValid)
 
-        if(isTokenValid)
-        user.auth.secondary.push({
-            id: 'totp',
-            key: req.query.key
-        })
-        callback(user)
+        return user
     },
 
     authenticate: (req, authData) => {
