@@ -8,7 +8,11 @@
     "dev": "export NODE_ENV='development' && node ./node_modules/nodemon/bin/nodemon.js bootstrap.js",
     "start": "babel-node --presets es2015 server.js"
   },
-  "author": "",
+  "author": "Bernd Schoolmann (Quexten)",
+  "repository": {
+    "type": "git",
+    "url": "https://git.quexten.com/quexten/sso-api"
+  },
   "license": "MIT",
   "dependencies": {
     "2fa": "^0.1.2",
@@ -19,11 +23,10 @@
     "cors": "^2.8.4",
     "es6-promisify": "^6.0.0",
     "express": "^4.14.1",
-    "express-session": "^1.15.1",
     "express-useragent": "^1.0.12",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.4",
-    "mongodb": "^3.0.10",
+    "mongodb": "^3.1.0",
     "passport": "^0.3.2",
     "passport-custom": "^1.0.5",
     "passport-facebook": "^2.1.1",
