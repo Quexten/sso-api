@@ -3,8 +3,16 @@ const tfa = require('2fa');
 let generateKey = promisify(tfa.generateKey)
 let generateQr = promisify(tfa.generateGoogleQR)
 
-module.exports = {
-    create: async () => {
+let SecondaryAuthenticator = require('./secondaryAuthenticator')
+
+
+class TotpAuthenticator extends SecondaryAuthenticator {
+
+    constructor () {
+        super()
+    }
+
+    async create () {
         let key = await generateKey(100)
         let qr = await generateQr('Quexten', 'Quexten\nQuexten', key)
 
@@ -12,9 +20,9 @@ module.exports = {
             qr: qr,
             key: key
         }
-    },
+    }
 
-    verify: async (req, res) => {
+    async verify () {
         let user = req.user
 
         let opts = {
@@ -22,6 +30,7 @@ module.exports = {
             afterDrift: 2,
             step: 30
         }
+
         let isTokenValid = tfa.verifyTOTP(req.query.key, req.query.code, opts)
         if(isTokenValid)
             user.auth.secondary.push({
@@ -29,12 +38,10 @@ module.exports = {
                 key: req.query.key
             })
 
-        res.send(isTokenValid)
-
         return user
-    },
+    }
 
-    authenticate: (req, authData) => {
+    async authenticate (req, authData) {
         var opts = {
             beforeDrift: 2,
             afterDrift: 2,
@@ -45,5 +52,9 @@ module.exports = {
 
         return isTokenValid
     }
+}
+
+module.exports = {
+    TotpAuthenticator: TotpAuthenticator
 }
 

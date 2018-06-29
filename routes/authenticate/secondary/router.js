@@ -3,9 +3,9 @@ let express = require('express')
 let router = express.Router()
 
 let secondaryAuthenticators = []
-secondaryAuthenticators["backup-codes"] = require("./codes")
-secondaryAuthenticators["totp"] = require("./totp")
-secondaryAuthenticators["u2f"] = require("./u2f")
+secondaryAuthenticators["backup-codes"] = require("../../../authenticate/secondary/codes")
+secondaryAuthenticators["totp"] = require("../../../authenticate/secondary/totp")
+secondaryAuthenticators["u2f"] = require("../../../authenticate/secondary/u2f")
 
 module.exports = (jwtHandler, database) => {
     router.get("/:authenticator/:method", (req, res, next) => {

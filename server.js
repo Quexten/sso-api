@@ -10,6 +10,7 @@ app.use(require('cookie-parser')())
 app.use(require('body-parser').urlencoded({ extended: true }))
 
 //Routers
-app.use("/authenticate", require("./authenticate/authenticator")(database))
+
+app.use()
 
 app.listen(3000)

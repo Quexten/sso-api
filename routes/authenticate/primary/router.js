@@ -1,4 +1,4 @@
-let test = require('./test')
+let test = require('../../../authenticate/primary/test')
 let express = require('express')
 let router = express.Router()
 
