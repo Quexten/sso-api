@@ -10,7 +10,4 @@ app.use(require('cookie-parser')())
 app.use(require('body-parser').urlencoded({ extended: true }))
 
 //Routers
-
-app.use()
-
 app.listen(3000)
