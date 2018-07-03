@@ -1,5 +1,24 @@
 pipeline:
-  docker:
+  restore-cache:
+      image: drillster/drone-volume-cache
+      restore: true
+      mount:
+        - ./.yarn-cache
+        - ./node_modules
+      volumes:
+        - /tmp/cache:/cache
+
+  install:
+    image: node:10.1.0
+    commands:
+      - node -v
+      - npm -v
+  testing:
+    image: node:10.1.0
+    group: testing
+    commands:
+      - npm test
+  publish:
     image: plugins/docker
     repo: quexten/sso-api
     tags: latest
