@@ -1,4 +1,4 @@
-let database = require('./db/database')
+/*let database = require('./db/database')
 let express = require('express')
 let app = express()
 
@@ -10,4 +10,5 @@ app.use(require('cookie-parser')())
 app.use(require('body-parser').urlencoded({ extended: true }))
 
 //Routers
-app.listen(3000)
+app.listen(3000)*/
+
