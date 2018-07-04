@@ -11,7 +11,6 @@ pipeline:
     image: node:10.1.0
     commands:
       - npm install
-      - npm -g install mocha
       - node -v
       - npm -v
 
@@ -19,6 +18,7 @@ pipeline:
     image: node:10.1.0
     group: testing
     commands:
+      - npm install -g mocha
       - npm test
 
   publish:
