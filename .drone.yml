@@ -10,9 +10,8 @@ pipeline:
   install:
     image: node:10.1.0
     commands:
-      - npm -g install
+      - npm install
       - npm -g install mocha
-      - npm run build
       - node -v
       - npm -v
 
