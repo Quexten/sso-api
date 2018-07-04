@@ -25,6 +25,8 @@ pipeline:
     repo: quexten/sso-api
     tags:
       - latest
+      - "{DRONE_TAG}"
+      - "{DRONE_COMMIT_SHA:0:8}"
     secrets: [ docker_username, docker_password ]
 
   rebuild-cache:
