@@ -1,14 +1,19 @@
 pipeline:
+  cache:
+    mount:
+      - node_modules
   install:
     image: node:10.1.0
     commands:
+      - npm -g install
+      - npm -g install mocha
+      - npm run build
       - node -v
       - npm -v
   test:
     image: node:10.1.0
     group: testing
     commands:
-      - npm install -g mocha
       - npm test
   publish:
     image: plugins/docker
