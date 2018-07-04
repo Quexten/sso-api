@@ -47,7 +47,6 @@ describe('User CRUD Test', () => {
             .then((user) => {
                 mockUser['test'] = 'mockUpdate'
                 assert.deepEqual(user, mockUser)
-                console.log('test')
             })
             .then(() => {
                 done()
