@@ -25,7 +25,6 @@ pipeline:
     repo: quexten/sso-api
     tags:
       - latest
-      - $COMMIT
     secrets: [ docker_username, docker_password ]
 
   notify:
