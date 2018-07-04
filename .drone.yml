@@ -4,6 +4,7 @@ pipeline:
     restore: true
     mount:
      - ./node_modules
+     - ./yarn.lock
     volumes:
       - /tmp/cache:/cache
 
@@ -32,6 +33,7 @@ pipeline:
     rebuild: true
     mount:
       - ./node_modules
+      - ./yarn.lock
     volumes:
       - /tmp/cache:/cache
 
