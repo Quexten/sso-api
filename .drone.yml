@@ -1,7 +1,12 @@
 pipeline:
-  cache:
+  restore-cache:
+    image: drillster/drone-volume-cache
+    restore: true
     mount:
-      - node_modules
+     - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
+
   install:
     image: node:10.1.0
     commands:
@@ -10,17 +15,30 @@ pipeline:
       - npm run build
       - node -v
       - npm -v
+
   test:
     image: node:10.1.0
     group: testing
     commands:
       - npm test
+
   publish:
     image: plugins/docker
     repo: quexten/sso-api
     tags: latest
     secrets: [ docker_username, docker_password ]
+
   notify:
     image: plugins/slack
     webhook: https://discordapp.com/api/webhooks/463932643856351242/Tui74Bn2F2JAWr6dGOn2DY3cpwTexf8EWi2VEzhRsm5Fm8BTC7YGh5XsHo4kx4Wm8fZk/slack
     channel: sso-api
+    when:
+      status: [ success, failure ]
+
+  rebuild-cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
