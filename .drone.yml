@@ -17,5 +17,5 @@ pipeline:
     secrets: [ docker_username, docker_password ]
   notify:
     image: plugins/slack
-    webhook_url: https://discordapp.com/api/webhooks/463932643856351242/Tui74Bn2F2JAWr6dGOn2DY3cpwTexf8EWi2VEzhRsm5Fm8BTC7YGh5XsHo4kx4Wm8fZk/slack
+    webhook: https://discordapp.com/api/webhooks/463932643856351242/Tui74Bn2F2JAWr6dGOn2DY3cpwTexf8EWi2VEzhRsm5Fm8BTC7YGh5XsHo4kx4Wm8fZk/slack
     channel: sso-api
