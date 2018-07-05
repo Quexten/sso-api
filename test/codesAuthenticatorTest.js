@@ -10,22 +10,44 @@ describe('Codes authenticator Test', () => {
             .create()
             .then((result) => {
                 assert.equal(result.id, 'backup-codes')
-                assert.notEqual(result.data)
+                assert.equal(result.data.codes.length, 8)
             })
             .then(done)
     })
 
-    it('Verify Codes', (done) => {
+    it('Verify Correct Codes', (done) => {
+        let mockRequestData = {
+            code: 'AAAA-AAAA-AAAA'
+        }
+        let mockDatabaseData = {
+            codes: ['AAAA-AAAA-AAAA']
+        }
+
         authenticator
-            .verify()
-            .then((data) => {
-                assert.equal(data.id, 'backup-codes')
-                assert.equal(data.codes.length, 8)
+            .verify(mockRequestData, mockDatabaseData)
+            .then((result) => {
+                assert.equal(result, true)
             })
             .then(done)
     })
 
-    it('Accept Correct Authentication Data', (done) => {
+    it('Reject Incorrect Codes', (done) => {
+        let mockRequestData = {
+            code: 'BBBB-BBBB-BBBB'
+        }
+        let mockDatabaseData = {
+            codes: ['AAAA-AAAA-AAAA']
+        }
+
+        authenticator
+            .verify(mockRequestData, mockDatabaseData)
+            .then((result) => {
+                assert.equal(result, false)
+            })
+            .then(done)
+    })
+
+    it('Remove Otp On Verification', (done) => {
         let authenticationData = {
             code: 'AAAAA-AAAAA-AAAAA'
         }
@@ -33,27 +55,11 @@ describe('Codes authenticator Test', () => {
             codes: ['AAAAA-AAAAA-AAAAA']
         }
         authenticator
-            .authenticate(authenticationData, databaseData)
+            .onAuthenticate(authenticationData, databaseData)
             .then((result) => {
-                assert.equal(result, true)
+                assert.equal(result.codes.length, 0)
             })
             .then(done)
     })
-
-    it('Reject Incorrect Authentication Data', (done) => {
-        let authenticationData = {
-            code: 'BBBBB-BBBBB-BBBBB'
-        }
-        let databaseData = {
-            codes: ['AAAAA-AAAAA-AAAAA']
-        }
-        authenticator
-            .authenticate(authenticationData, databaseData)
-            .then((result) => {
-                assert.equal(result, false)
-            })
-            .then(done)
-    })
-
 
 })

@@ -5,7 +5,6 @@ let generateQr = promisify(tfa.generateGoogleQR)
 
 let SecondaryAuthenticator = require('./secondaryAuthenticator')
 
-
 class TotpAuthenticator extends SecondaryAuthenticator {
 
     constructor () {
@@ -25,7 +24,7 @@ class TotpAuthenticator extends SecondaryAuthenticator {
         }
     }
 
-    async verify (data) {
+    async verify (data, claim) {
         let opts = {
             beforeDrift: 2,
             afterDrift: 2,
@@ -42,16 +41,8 @@ class TotpAuthenticator extends SecondaryAuthenticator {
         return user
     }
 
-    async authenticate (req, authData) {
-        var opts = {
-            beforeDrift: 2,
-            afterDrift: 2,
-            step: 30
-        }
-
-        let isTokenValid = tfa.verifyTOTP(authData.key, req.query.code, opts)
-
-        return isTokenValid
+    async onAuthenticate (requestData, databaseData) {
+        return databaseData
     }
 }
 

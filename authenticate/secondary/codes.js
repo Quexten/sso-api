@@ -19,13 +19,15 @@ class CodesAuthenticator extends SecondaryAuthenticator {
         }
     }
 
-    async verify () {
-        return true
-    }
-
-    async authenticate (requestData, databaseData) {
+    async verify (requestData, databaseData) {
         let code = requestData.code
         return databaseData.codes.indexOf(code) > -1
+    }
+
+    async onAuthenticate (requestData, databaseData) {
+        let code = requestData.code
+        databaseData.codes = databaseData.codes.filter((entry) => { return entry !== code })
+        return databaseData
     }
 
 }

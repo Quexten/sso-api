@@ -8,12 +8,14 @@ module.exports = class SecondaryAuthenticator {
         // { id: [AuthenticatorId], data: CustomAuthData
     }
 
-    async verify (data) {
-        // returns true if data is verified, otherwise returns false
+    async verify (requestData, databaseData) {
+        //returns whether request data could be matched
+        // with databse data
     }
 
-    async authenticate (requestData, databaseData) {
-        //return whether the auth is successful
+    async onAuthenticate (requestData, databaseData) {
+        //runs on successful authentication, for instance
+        //to remove used otp's
     }
 
 }

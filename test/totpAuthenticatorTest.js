@@ -3,6 +3,7 @@ let assert = require('assert')
 let { TotpAuthenticator } = require("../authenticate/secondary/totp")
 
 describe('Totp authenticator Test', () => {
+
     let authenticator = new TotpAuthenticator()
 
     it('Create Totp', (done) => {
