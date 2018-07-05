@@ -23,7 +23,7 @@ class CodesAuthenticator extends SecondaryAuthenticator {
 
     async authenticate (requestData, databaseData) {
         let code = requestData.code
-        return requestData.codes.indexOf(code) > -1
+        return databaseData.codes.indexOf(code) > -1
     }
 
 }
