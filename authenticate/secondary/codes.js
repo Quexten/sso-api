@@ -13,12 +13,14 @@ class CodesAuthenticator extends SecondaryAuthenticator {
         let codes = await generateBackupCodes(8, 'xxxx-xxxx-xxxx')
         return {
             id: 'backup-codes',
-            codes: codes
+            data: {
+                codes: codes
+            }
         }
     }
 
     async verify () {
-
+        return true
     }
 
     async authenticate (requestData, databaseData) {

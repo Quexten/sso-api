@@ -17,14 +17,15 @@ class TotpAuthenticator extends SecondaryAuthenticator {
         let qr = await generateQr('Quexten', 'Quexten\nQuexten', key)
 
         return {
-            qr: qr,
-            key: key
+            id: 'totp',
+            data: {
+                qr: qr,
+                key: key
+            }
         }
     }
 
-    async verify () {
-        let user = req.user
-
+    async verify (data) {
         let opts = {
             beforeDrift: 2,
             afterDrift: 2,

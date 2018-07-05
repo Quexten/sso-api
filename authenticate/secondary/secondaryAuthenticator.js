@@ -4,11 +4,12 @@ module.exports = class SecondaryAuthenticator {
     }
 
     async create () {
-        // returns the data to send back to the client
+        // returns the data of the form:
+        // { id: [AuthenticatorId], data: CustomAuthData
     }
 
     async verify (data) {
-        //rejects if can't be verified, otherwise returns data
+        // returns true if data is verified, otherwise returns false
     }
 
     async authenticate (requestData, databaseData) {

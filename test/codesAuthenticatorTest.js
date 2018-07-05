@@ -8,6 +8,16 @@ describe('Codes authenticator Test', () => {
     it('Create Codes', (done) => {
         authenticator
             .create()
+            .then((result) => {
+                assert.equal(result.id, 'backup-codes')
+                assert.notEqual(result.data)
+            })
+            .then(done)
+    })
+
+    it('Verify Codes', (done) => {
+        authenticator
+            .verify()
             .then((data) => {
                 assert.equal(data.id, 'backup-codes')
                 assert.equal(data.codes.length, 8)
