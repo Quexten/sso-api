@@ -1,5 +1,7 @@
 let users = []
 
+let id = 0
+
 module.exports = {
     createUser: async function (user) {
         users[users.length] = user
@@ -26,7 +28,7 @@ module.exports = {
         return null
     },
 
-    finduserBySecondaryAuthenticatorId: async (authType, id) => {
+    findUserBySecondaryAuthenticatorId: async (authType, id) => {
         for (let user in users) {
             let authenticators = user.auth.primary
             let matchingTypeAuthenticators = authenticators.filter(authenticator => authenticator.type === authType)
@@ -35,5 +37,9 @@ module.exports = {
                 return user
         }
         return null
+    },
+
+    getUniqueId: async () => {
+        return id++
     }
 }

@@ -1,5 +1,4 @@
 module.exports = (database) => {
-    let {ObjectID} = require('mongodb')
 
     let { CodesAuthenticator } = require('./codes')
     let { TotpAuthenticator } = require('./totp')
@@ -10,7 +9,7 @@ module.exports = (database) => {
 
     let create = async (authenticatorType) => {
         if (authenticators[authenticatorType] === null)
-            reject('No such authenticator found')
+            throw new Error('No such authenticator found')
         else {
             return authenticators[authenticatorType].create()
         }
@@ -18,7 +17,7 @@ module.exports = (database) => {
 
     let verify = async (userId, authenticatorType, data) => {
         if (authenticators[authenticatorType] === null)
-            reject('No such authenticator found')
+            throw new Error('No such authenticator found')
         else {
             let user = await database.findUserById(userId)
 
@@ -28,7 +27,7 @@ module.exports = (database) => {
                 user.auth.secondary.push({
                     authenticatorId: authenticatorType,
                     data: data,
-                    _id: new ObjectId()
+                    _id: await database.
                 })
             } catch (err) {
                 console.log(err)
@@ -39,25 +38,8 @@ module.exports = (database) => {
         }
     }
 
-    let authenticate = async (userId, authenticatorType, data) => {
-        if (authenticators[authenticatorType] === null) {
-            reject('No such authenticator found')
-        } else {
-            let user = await database.findUserById(userId)
-
-            user.auth.secondary.forEach((userAuthData) => {
-                if (userAuthData.id == authenticatorType) {
-                    if (authenticators[authenticatorType].authenticate(data, userAuthData.data))
-                        return true
-                }
-            })
-            return false
-        }
-    }
-
     return {
         create: create,
-        verify: verify,
-        authenticate: authenticate
+        verify: verify
     }
 }

@@ -1,33 +1,18 @@
-let test = require('../../../authenticate/primary/test')
 let express = require('express')
 let router = express.Router()
 
-let authenticators = []
-authenticators['test'] = test
+module.exports = function(database, primaryAuthenticator) {
 
-module.exports = function (jwtHandler, database) {
-    router.get("/:authenticator/signIn", (req, res) => {
+    router.post('/:authenticator', (req, res) => {
         let authenticatorType = req.params.authenticator
-        authenticators[authenticatorType].signIn(req, database, (user) => {
-            database.updateUser(user._id, user)
+        let authenticatorData = req.body
+        primaryAuthenticator.requestAuthentication(authenticatorType, authenticatorData)
+    })
 
-            let jwtToken = jwtHandler.generatePrimaryAuthToken(user._id)
-            res.set('primaryToken', jwtToken)
-
-
-            let secondaryAuthenticators = []
-            user.auth.secondary.forEach((authenticator) => {
-                if(secondaryAuthenticators.indexOf(authenticator.authenticatorId) == -1)
-                    secondaryAuthenticators.push(authenticator.authenticatorId)
-            })
-            if (secondaryAuthenticators.length == 0)
-                secondaryAuthenticators.push('none')
-
-            res.send({
-                success: true,
-                secondaryAuthenticators: secondaryAuthenticators
-            })
-        })
+    router.post('/:authenticator/callback', (req, res) => {
+        let authenticatorType = req.params.authenticator
+        let authenticatorData = req.body
+        primaryAuthenticator.verifyAuthentication(authenticatorType, authenticatorData)
     })
 
     return router
