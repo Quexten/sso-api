@@ -14,7 +14,7 @@ module.exports = function(database) {
     let createUser = async () => {
         let user = {
             _id: await database.getUniqueId(),
-            authenticators: {
+            authentication: {
                 primary: [],
                 secondary: []
             },
@@ -42,18 +42,20 @@ module.exports = function(database) {
         return authenticators[authenticatorType].requestAuthentication(authenticationData)
     }
 
-    let verifyAuthentication = async (authenticatorType, authenticationData) => {
+    let verifyAuthentication = async (authenticatorType, authenticationId, authenticationData) => {
         if (!await isAuthenticatorRegistered(authenticatorType)) {
             throw new Error('Authenticator type ' + authenticatorType + ' not available.')
         }
 
-        let user = await database.getUserByAuthenticatorId(authenticatorType, authenticatorId)
+        let user = await database.findUserByPrimaryAuthenticatorId(authenticatorType, authenticationId)
 
         if (user === null) {
             user = createUser()
         }
 
-        return authenticators[authenticatorType].verifyAuthentication(authenticatorType)
+        authenticators[authenticatorType].verifyAuthentication(authenticatorType)
+
+        return
     }
 
     let removeUser = async (id) => {
