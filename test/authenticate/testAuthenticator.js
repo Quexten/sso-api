@@ -10,6 +10,7 @@ class TestAuthenticator extends PrimaryAuthenticator {
     }
 
     async verifyAuthentication (requestData, databaseData) {
+        return true
     }
 
 }

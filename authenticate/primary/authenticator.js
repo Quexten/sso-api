@@ -50,12 +50,29 @@ module.exports = function(database) {
         let user = await database.findUserByPrimaryAuthenticatorId(authenticatorType, authenticationId)
 
         if (user === null) {
-            user = createUser()
+            user = await createUser()
+            return
+        } else {
+            let authenticated = false
+            let verificationPromises = []
+
+            for (let id in user.authentication.primary) {
+                let authenticator = user.authentication.primary[id]
+                verificationPromises.push(
+                    authenticators[authenticatorType]
+                        .verifyAuthentication(authenticationData, authenticator)
+                        .then((result) => {
+                            if (result)
+                                authenticated = true
+                        })
+                )
+            }
+
+            await Promise.all(verificationPromises)
+
+            if (!authenticated)
+                throw new Error('Could not authenticate')
         }
-
-        authenticators[authenticatorType].verifyAuthentication(authenticatorType)
-
-        return
     }
 
     let removeUser = async (id) => {
