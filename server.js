@@ -5,7 +5,6 @@ let app = express()
 let primaryAuthenticator = require('./authenticate/primary/primaryAuthenticator')
 let secondaryAuthenticator = require('./authenticate/secondary/secondaryAuthenticator')
 
-
 //Middlewares
 app.use(require('cors')({
     origin: 'http://localhost:1024'
