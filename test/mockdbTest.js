@@ -2,7 +2,7 @@ let assert = require('assert')
 
 describe('User CRUD Test', () => {
     it('Create user', (done) => {
-        let mockdb = require('./db/mockdb')
+        let mockdb = require('./db/mockdb') ()
         let mockUser = { 'test': 'mock' }
 
         mockdb
@@ -17,7 +17,7 @@ describe('User CRUD Test', () => {
     })
 
     it('Find user', (done) => {
-        let mockdb = require('./db/mockdb')
+        let mockdb = require('./db/mockdb')()
         let mockUser = { 'test': 'mock' }
 
         mockdb
@@ -32,7 +32,7 @@ describe('User CRUD Test', () => {
     })
 
     it('Update user', (done) => {
-        let mockdb = require('./db/mockdb')
+        let mockdb = require('./db/mockdb')()
         let mockUser = { 'test': 'mock' }
 
         mockdb
@@ -54,7 +54,7 @@ describe('User CRUD Test', () => {
     })
 
     it('Not find nonexsistent user', (done) => {
-        let mockdb = require('./db/mockdb')
+        let mockdb = require('./db/mockdb')()
         let mockUser = { 'test': 'mock' }
 
         mockdb
@@ -70,7 +70,7 @@ describe('User CRUD Test', () => {
     })
 
     it('Delete user', (done) => {
-        let mockdb = require('./db/mockdb')
+        let mockdb = require('./db/mockdb')()
         let mockUser = { 'test': 'mock' }
 
         mockdb

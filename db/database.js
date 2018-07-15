@@ -1,14 +1,17 @@
-const { MongoClient, ObjectId } = require('mongodb')
-var url = "mongodb://localhost:27017/"
-var users = ''
+module.exports = (url) => {
+    let { MongoClient, ObjectId } = require('mongodb')
+    let users = ''
 
-MongoClient.connect(url, function(err, db) {
-    if (err) throw err
-    var dbo = db.db("sso")
-    users = dbo.collection("users")
-})
+    MongoClient.connect(url, function(err, db) {
+        if (err)
+            throw err
+        let dbo = db.db("sso")
+        users = dbo.collection("users")
+    })
 
-module.exports = {
+    async function findUserById () {
+
+    }
     findUserById: async function (id) {
         return await users.findOne({
             _id: ObjectId(id)

@@ -4,7 +4,7 @@ let { TestAuthenticator } = require('./authenticate/testAuthenticator')
 
 
 let createEmptyAuthenticator = async () => {
-    return primaryAuthenticator(require('./db/mockdb'))
+    return primaryAuthenticator(require('./db/mockdb')())
 }
 
 let createTestAuthenticator = async () => {
