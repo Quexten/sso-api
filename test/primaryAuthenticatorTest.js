@@ -1,10 +1,11 @@
 let assert = require('assert')
 let primaryAuthenticator = require('../authenticate/primary/authenticator')
+let jwtHandler = require('../authenticate/jwtHandler')('test')
 let { TestAuthenticator } = require('./authenticate/testAuthenticator')
 
 
 let createEmptyAuthenticator = async () => {
-    return primaryAuthenticator(require('./db/mockdb')())
+    return primaryAuthenticator(require('./db/mockdb')(), jwtHandler)
 }
 
 let createTestAuthenticator = async () => {

@@ -6,7 +6,7 @@ module.exports = class PrimaryAuthenticator {
     async requestAuthentication (requestData) {
     }
 
-    async verifyAuthentication (requestData, databaseData) {
+    async verifyAuthentication (requestData) {
     }
 
 }

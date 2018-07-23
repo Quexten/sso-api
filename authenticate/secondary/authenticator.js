@@ -1,4 +1,4 @@
-module.exports = (database) => {
+module.exports = (database, jwtHandler) => {
 
     let { CodesAuthenticator } = require('./codes')
     let { TotpAuthenticator } = require('./totp')
@@ -19,7 +19,7 @@ module.exports = (database) => {
         if (authenticators[authenticatorType] === null)
             throw new Error('No such authenticator found')
         else {
-            let user = await database.findUserById(userId)
+            let user = await database.findUser(userId)
 
             try {
                 let data = authenticators[authenticatorType].verify(data)

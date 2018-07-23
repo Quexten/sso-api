@@ -1,4 +1,4 @@
-module.exports = function(database) {
+module.exports = function(database, jwtHandler) {
 
     let authenticators = {}
 
@@ -16,7 +16,8 @@ module.exports = function(database) {
             _id: await database.getUniqueId(),
             authentication: {
                 primary: [],
-                secondary: []
+                secondary: [],
+                sessions: []
             },
             audit: {
                 events: [
@@ -51,7 +52,6 @@ module.exports = function(database) {
 
         if (user === null) {
             user = await createUser()
-            return
         } else {
             let authenticated = false
             let verificationPromises = []
@@ -72,6 +72,14 @@ module.exports = function(database) {
 
             if (!authenticated)
                 throw new Error('Could not authenticate')
+        }
+
+        let token = await generatePrimaryToken(user._id)
+
+        //Return
+        return {
+            user,
+            token
         }
     }
 
@@ -107,6 +115,12 @@ module.exports = function(database) {
         database.updateUser(id, authenticatorId)
     }
 
+    let generatePrimaryToken = async (id) => {
+        return await jwtHandler.generateToken({
+            "authenticationType": "primary",
+            "id": id
+        })
+    }
 
     return {
         registerAuthenticator: registerAuthenticator,

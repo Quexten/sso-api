@@ -1,8 +1,11 @@
 let express = require('express')
 let app = express()
 
+let database = require('./test/db/mockdb')()
 
-let primaryAuthenticator = require('./authenticate/primary/primaryAuthenticator')
+let jwtHandler = require('./authenticate/jwtHandler')('test')
+let sessionHandler = require('./authenticate/sessionHandler')(database, jwtHandler)
+
 let secondaryAuthenticator = require('./authenticate/secondary/secondaryAuthenticator')
 
 //Middlewares
@@ -13,9 +16,8 @@ app.use(require('cookie-parser')())
 app.use(require('body-parser').urlencoded({ extended: true }))
 app.use(require('body-parser').json())
 
-app.use('/authenticate', require('./routes/authenticate/router'))
+app.use('/authenticate', require('./routes/authenticate/router')(database,primaryAuthenticator, secondaryAuthenticator, sessionHandler))
 
 //Routers
 app.listen(3000)
 console.log('listening on 3000')
-

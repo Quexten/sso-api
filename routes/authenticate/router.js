@@ -1,16 +1,23 @@
-module.exports = (database) => {
+module.exports = (database, primaryAuthenticator, secondaryAuthenticator, sessionHandler) => {
     const express = require('express')
     const router = express.Router()
 
-    router.use("/primary", require("./primary/router")(database))
-    router.use("/secondary", require("./secondary/router")(database))
-    router.get("/exchange", (req, res) => {
-        let primaryToken = req.headers['primary']
-        let secondaryToken = req.headers['secondary']
+    router.use("/primary", require("./primary/router")(database, primaryAuthenticator))
+    router.use("/secondary", require("./secondary/router")(database, secondaryAuthenticator))
+    router.post("/exchange", async (req, res) => {
+        let primaryToken = req.body.primary
+        let secondaryToken = req.body.secondary
 
-        if (jwtHandler.validateAuthToken(primaryToken)
-            && jwtHandler.validateAuthToken(secondaryToken)) {
-
+        try {
+            let userId = await sessionHandler.validateExchange(primaryToken, secondaryToken)
+            let useragent = req.get('User-Agent')
+            let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress)
+            let sessionInfo = await sessionHandler.createSession(userId, useragent, ip)
+            res.send(sessionInfo)
+        } catch (err) {
+            res.send({
+                error: "Could not validate exchange"
+            })
         }
     })
     return router
