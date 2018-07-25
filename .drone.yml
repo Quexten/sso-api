@@ -49,7 +49,7 @@ pipeline:
     token: 676321391:AAFWtrvlqju_8um3ur8gDP16EHJmzPtFQyU
     to: 436061013
     message:
-      Build {{build.number}} succeded.
+      Build {{build.number}} failed. {{ build.link }}
     when:
       status: [ failure ]
 
@@ -58,6 +58,6 @@ pipeline:
     token: 686461508:AAEaWghtYF8eE2ve6_TsPj46aZwbxKC5v-8
     to: 436061013
     message:
-      Build {{build.number}} failed.
+      Build {{build.number}} succeded. {{ build.link }}
     when:
       status: [ success ]    
