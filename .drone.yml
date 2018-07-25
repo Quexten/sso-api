@@ -47,7 +47,7 @@ pipeline:
   notify-telegram-fail:
     image: appleboy/drone-telegram
     token: 676321391:AAFWtrvlqju_8um3ur8gDP16EHJmzPtFQyU
-    to: quexten_builds
+    to: 436061013
     message:
       Build {{build.number}} succeded.
     when:
@@ -56,7 +56,7 @@ pipeline:
   notify-telegrame-success:
     image: appleboy/drone-telegram
     token: 686461508:AAEaWghtYF8eE2ve6_TsPj46aZwbxKC5v-8
-    to: quexten_builds
+    to: 436061013
     message:
       Build {{build.number}} failed.
     when:
