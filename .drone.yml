@@ -37,9 +37,27 @@ pipeline:
     volumes:
       - /tmp/cache:/cache
 
-  notify:
+  notify-discord:
     image: appleboy/drone-discord:1.0.0
     webhook_id: 463932643856351242
     webhook_token: Tui74Bn2F2JAWr6dGOn2DY3cpwTexf8EWi2VEzhRsm5Fm8BTC7YGh5XsHo4kx4Wm8fZk
     when:
       status: [ success, failure ]
+  
+  notify-telegram-fail:
+    image: appleboy/drone-telegram
+    token: 676321391:AAFWtrvlqju_8um3ur8gDP16EHJmzPtFQyU
+    to: quexten_builds
+      message:
+      Build {{build.number}} succeded.
+    when:
+      status: [ failure ]
+
+  notify-telegrame-success:
+    image: appleboy/drone-telegram
+    token: 686461508:AAEaWghtYF8eE2ve6_TsPj46aZwbxKC5v-8
+    to: quexten_builds
+      message:
+      Build {{build.number}} failed.
+    when:
+      status: [ success ]    
