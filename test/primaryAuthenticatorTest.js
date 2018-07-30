@@ -1,5 +1,5 @@
 let assert = require('assert')
-let primaryAuthenticator = require('../authenticate/primary/authenticator')
+let primaryAuthenticator = require('../authenticate/primary/controller')
 let jwtHandler = require('../authenticate/jwtHandler')('test')
 let { TestAuthenticator } = require('./authenticate/testAuthenticator')
 

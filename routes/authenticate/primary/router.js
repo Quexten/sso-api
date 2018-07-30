@@ -3,10 +3,10 @@ let router = express.Router()
 
 module.exports = function(database, primaryAuthenticator) {
 
-    router.post('/:authenticator', (req, res) => {
+    router.post('/:authenticator', async (req, res) => {
         let authenticatorType = req.params.authenticator
         let authenticatorData = req.body
-        primaryAuthenticator.requestAuthentication(authenticatorType, authenticatorData)
+        await primaryAuthenticator.requestAuthentication(authenticatorType, authenticatorData)
         res.send('ok')
     })
 

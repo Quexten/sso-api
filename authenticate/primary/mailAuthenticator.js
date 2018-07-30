@@ -7,7 +7,7 @@ let makeLoginHtml = async (link) => {
 module.exports = class MailAuthenticator {
 
     constructor(config, jwtHandler) {
-        this.mailgun = mailgun(config.mailgunApiKey, config.mailgunDomain, config.mailgunSender)
+        this.mailgun = mailgun(config.apiKey, config.domain, config.sender)
         this.jwtHandler = jwtHandler
         this.authUrl = config.authUrl + 'mail/callback/'
     }
@@ -21,8 +21,7 @@ module.exports = class MailAuthenticator {
             redirect: redirect
         })
         let loginLink = this.authUrl + '?token=' + jwtToken
-        console.log('email link: ' + loginLink)
-        //this.mailgun.send(mail, 'Login', await makeLoginHtml(loginLink))
+        this.mailgun.send(mail, 'Login', await makeLoginHtml(loginLink))
     }
 
     async verifyAuthentication (requestData) {
