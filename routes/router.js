@@ -1,8 +1,9 @@
-module.exports = function (database) {
+module.exports = function (database, primaryController, secondaryController, sessionHandler, profileApi) {
     const express = require('express')
     const router = express.Router()
 
-    router.use("/users", require("./users/router")(database))
+    router.use("/api", require("./api/router")(profileApi))
+    router.use("/auth", require("./authenticate/router")(database, primaryController, secondaryController, sessionHandler))
 
     return router
 }

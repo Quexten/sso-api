@@ -13,6 +13,8 @@ module.exports = (database, primaryAuthenticator, secondaryAuthenticator, sessio
             let useragent = req.get('User-Agent')
             let ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress)
             let sessionInfo = await sessionHandler.createSession(userId, useragent, ip)
+            res.cookie('com.quexten.sso.userId', userId)
+            res.cookie('com.quexten.sso.sessionToken', sessionInfo.token)
             res.send(sessionInfo)
         } catch (err) {
             res.send({

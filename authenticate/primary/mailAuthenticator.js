@@ -9,7 +9,7 @@ module.exports = class MailAuthenticator {
     constructor(config, jwtHandler) {
         this.mailgun = mailgun(config.apiKey, config.domain, config.sender)
         this.jwtHandler = jwtHandler
-        this.authUrl = config.authUrl + 'mail/callback/'
+        this.authUrl = config.authUrl + '/#/login/email/callback'
     }
 
     async requestAuthentication (requestData) {
