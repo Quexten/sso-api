@@ -3,6 +3,7 @@ let loginTemplate = require('fs').readFileSync('mails/emailLogin.html', 'utf8')
 let makeLoginHtml = async (link) => {
     return loginTemplate.replace(/REPLACELINK/g, link)
 }
+let gravatar = require('gravatar')
 
 module.exports = class MailAuthenticator {
 
@@ -27,8 +28,14 @@ module.exports = class MailAuthenticator {
     async verifyAuthentication (requestData) {
         if (jwtHandler.validateToken(requestData)) {
             let data = jwtHandler.parseAuthToken(requestData)
+            let avatar = gravatar.url(data.mail, {
+                protocol: 'https',
+                s: '512',
+                r: 'pg',
+            })
             return {
                 id: data.mail,
+                avatar: avatar,
                 redirect: data.redirect
             }
         }

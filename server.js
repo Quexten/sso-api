@@ -39,5 +39,6 @@ let app = async () => {
     //Routers
     app.listen(config.api.port)
     console.log('listening on port: ' + config.api.port)
+    require('./imageImporter')(config.aws).setUserImage(54555, 'https://s.gravatar.com/avatar/b2e0cbf930a9ccfb0494b56f5d8f9a1b?s=512')
 }
 app()

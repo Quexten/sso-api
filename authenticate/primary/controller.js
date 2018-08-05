@@ -21,8 +21,7 @@ module.exports = function(database, jwtHandler) {
             },
             audit: {
                 events: [
-                ],
-                enabled: false
+                ]
             },
             profile: {
                 avatar: '',
