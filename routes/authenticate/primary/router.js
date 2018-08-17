@@ -6,8 +6,9 @@ module.exports = function(database, primaryAuthenticator) {
     router.post('/:authenticator', async (req, res) => {
         let authenticatorType = req.params.authenticator
         let authenticatorData = req.body
-        await primaryAuthenticator.requestAuthentication(authenticatorType, authenticatorData)
-        res.send('ok')
+
+        let redirectUri = await primaryAuthenticator.requestAuthentication(authenticatorType, authenticatorData)
+        res.send({ redirectUri })
     })
 
     router.post('/:authenticator/callback', async (req, res) => {

@@ -1,4 +1,4 @@
-module.exports = function () {
+module.exports = function (auditApi) {
     let users = {}
     let id = 0
 
@@ -17,7 +17,7 @@ module.exports = function () {
     }
 
     let deleteUser = function (id) {
-        users[id] = null
+        delete users[id]
     }
 
     let findUserByPrimaryAuthenticatorId = async (authType, id) => {
@@ -47,6 +47,14 @@ module.exports = function () {
         return null
     }
 
+    let getUsers = async () => {
+        let userArray = []
+        for (let userId in users) {
+            userArray.push(users[userId])
+        }
+        return userArray
+    }
+
     let getUniqueId = async () => {
         return id++
     }
@@ -58,6 +66,7 @@ module.exports = function () {
         deleteUser: deleteUser,
         findUserByPrimaryAuthenticatorId: findUserByPrimaryAuthenticatorId,
         findUserBySecondaryAuthenticatorId: findUserBySecondaryAuthenticatorId,
-        getUniqueId: getUniqueId
+        getUniqueId: getUniqueId,
+        getUsers: getUsers
     }
 }
