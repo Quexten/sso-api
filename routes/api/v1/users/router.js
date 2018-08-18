@@ -1,20 +1,28 @@
+let ensureUserIsAuthenticated = (req, res, next) => {
+    if (req.userId === parseInt(req.params.userId))
+        next()
+    else
+        res.send('error')
+}
+
 module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
     const express = require('express')
     const router = express.Router()
 
     router.get('/', async (req, res) => {
         let userArray = await userApi.getUsers()
+        userArray = userArray.map((user) => user.profile)
         res.send({
             users: userArray
         })
     })
-    router.get('/:userId', async (req, res) => {
+    router.get('/:userId', ensureUserIsAuthenticated, async (req, res) => {
         let userId = req.params.userId
         let user = await userApi.getUser(userId)
 
         res.send(user)
     })
-    router.delete('/:userId', async (req, res) => {
+    router.delete('/:userId', ensureUserIsAuthenticated, async (req, res) => {
         let userId = req.params.userId
         await userApi.deleteUser(userId)
         res.send('ok')
@@ -43,9 +51,9 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
         res.send(user)
     })
 
-    router.use('/:userId/audit', require('./audit')(auditApi))
+    router.use('/:userId/audit', ensureUserIsAuthenticated, require('./audit')(auditApi))
     router.use("/:userId/profile", require("./profile")(profileApi))
-    router.use('/:userId/sessions', require('./sessions'))
+    router.use('/:userId/sessions', ensureUserIsAuthenticated, require('./sessions'))
 
     return router
 }

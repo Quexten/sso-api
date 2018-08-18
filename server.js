@@ -47,7 +47,15 @@ let app = async () => {
     app.use(require('cookie-parser')())
     app.use(require('body-parser').urlencoded({ extended: true }))
     app.use(require('body-parser').json())
-
+    app.use((req, res, next) => {
+        let sessionToken = req.headers['session-token']
+        if (sessionToken !== null && jwtHandler.validateToken(sessionToken)) {
+            let session = jwtHandler.parseToken(sessionToken)
+            if (session.data.tokenType === 'sessionToken')
+                req.userId = session.data.userId
+        }
+        next()
+    })
 
     let sessionHandler = require('./authenticate/sessionHandler')(database, app, jwtHandler, auditApi)
 

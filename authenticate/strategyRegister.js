@@ -5,7 +5,7 @@ module.exports = async (database, app, config) => {
     let GoogleStrategy = require('passport-google-oauth20').Strategy
     let MailStrategy = require('../passport/MailStrategy')
     let SteamStrategy = require('passport-steam').Strategy
-    var DiscordStrategy = require('passport-discord').Strategy;
+    let DiscordStrategy = require('passport-discord').Strategy;
     let jwt = require('jsonwebtoken')
 
     let tokenForAuthenticator = async (authenticator, strategy) => {
@@ -98,7 +98,7 @@ module.exports = async (database, app, config) => {
         passport.authenticate('mailgun', { session: false })
     )
     app.get('/auth/mail/callback',
-        passport.authenticate('mailgun', {session: false}),
+        passport.authenticate('mailgun', { session: false }),
         async (req, res) => {
             let redirect = req.cookies.redirect
             res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
