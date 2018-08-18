@@ -33,7 +33,8 @@ module.exports = async (database, app, config) => {
             avatar = avatar.substr(0, avatar.length - 6)
             done(null, {
                 id: profile.id,
-                avatar: avatar
+                avatar: avatar,
+                type: 'google'
             })
         }
     ))
@@ -42,7 +43,8 @@ module.exports = async (database, app, config) => {
         function(identifier, profile, done) {
             done(null, {
                 id: profile.id,
-                avatar: profile.photos[2].value
+                avatar: profile.photos[2].value,
+                type: 'steam'
             })
         }
     ))
@@ -56,7 +58,8 @@ module.exports = async (database, app, config) => {
                 + '.png?size=1024'
             done(null, {
                 id: profile.id,
-                avatar: avatar
+                avatar: avatar,
+                type: 'discord'
             })
         }))
 
@@ -96,8 +99,9 @@ module.exports = async (database, app, config) => {
     )
     app.get('/auth/mail/callback',
         passport.authenticate('mailgun', {session: false}),
-        (req, res) => {
-            res.send(tokenForAuthenticator(req.user, 'mailgun'))
+        async (req, res) => {
+            let redirect = req.cookies.redirect
+            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
         })
 
     app.get('/auth/discord',
@@ -112,6 +116,6 @@ module.exports = async (database, app, config) => {
         session: false
     }),  async (req, res) => {
         let redirect = req.cookies.redirect
-        res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
+        res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
     });
 }

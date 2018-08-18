@@ -30,7 +30,7 @@ module.exports = function (auditApi) {
             let authenticators = user.authentication.primary
             let matchingTypeAuthenticators = authenticators.filter(authenticator => authenticator.type === authType)
             let matchingAuthenticators = matchingTypeAuthenticators.filter(authenticator => authenticator.id === id)
-            if (matchingTypeAuthenticators.size > 0)
+            if (matchingAuthenticators.length > 0)
                 return user
         }
         return null

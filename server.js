@@ -6,14 +6,15 @@ let app = async () => {
     let database = require('./test/db/mockdb')()
 
     let jwtHandler = require('./authenticate/jwtHandler')(config.jwtHandler.secret)
-    let sessionHandler = require('./authenticate/sessionHandler')(database, jwtHandler)
-
     //Set up api's
     let avatarApi = await require('./users/avatarApi')(config.aws)
+
     let profileApi = await require('./users/profileApi')(database, avatarApi)
     let auditApi = await require('./users/auditApi')(database)
     let userApi = await require('./users/userApi')(database)
     let authApi = await require('./users/authenticationApi')(database)
+
+
     //Set up authentication
     //Primary
     //let primaryController = require('./authenticate/primary/controller')(database, jwtHandler)
@@ -46,6 +47,9 @@ let app = async () => {
     app.use(require('cookie-parser')())
     app.use(require('body-parser').urlencoded({ extended: true }))
     app.use(require('body-parser').json())
+
+
+    let sessionHandler = require('./authenticate/sessionHandler')(database, app, jwtHandler, auditApi)
 
     app.use('/', require('./routes/router')(database, secondaryController, sessionHandler, profileApi, auditApi, userApi, jwtHandler, authApi))
 

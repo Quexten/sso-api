@@ -1,47 +1,31 @@
-const TokenGenerator = require('uuid-token-generator');
+module.exports = async (database, app, jwtHandler, auditApi) => {
 
-function generateToken () {
-    const tokgen = new TokenGenerator(256, TokenGenerator.BASE62)
-    return tokgen.generate()
-}
-
-module.exports = function (database, jwtHandler) {
-    return {
-        validateExchange: async (primaryToken, secondaryToken) => {
-            //TODO add secondary validation
-            if (!await jwtHandler.validateToken(primaryToken))
-                throw new Error('Could not validate tokens')
-
-            let parsedPrimaryToken = await jwtHandler.parseToken(primaryToken)
-            let primaryTokenId = parsedPrimaryToken.data.id
-
-            if (parsedPrimaryToken.data.authenticationType !== 'primary')
-                throw new Error('Incorrect token submitted')
-
-            //if (! primaryToken.id === secondaryToken.id)
-            //    throw new Error('Secondary token bears different id than primary token')
-
-            return primaryTokenId
-        },
-        createSession: async (id, useragent, ip) => {
-            let token = generateToken()
-
-            let user = await database.findUser(id)
-
-            let sessions = user.authentication.sessions
-            sessions.push({
-                created: new Date(),
-                useragent,
-                ip,
-                token: token
-            })
-
-            await database.updateUser(id, user)
-
-            return {
-                userId: id.toString(),
-                token
-            }
+    app.post('/auth/exchange', async (req, res) => {
+        let primaryAuthToken = req.body.primaryAuthToken
+        let secondaryAuthToken = req.body.secondaryAuthToken
+        if (!jwtHandler.validateToken(primaryAuthToken)) {
+            res.send('error')
+            return
         }
-    }
+
+        let parsedPrimaryAuthToken = jwtHandler.parseToken(primaryAuthToken)
+        if (!(parsedPrimaryAuthToken.tokenType === 'primaryAuthToken')) {
+            res.send('error')
+            return
+        }
+
+        let user = await database.findUserByPrimaryAuthenticatorId(parsedPrimaryAuthToken.primaryAuthenticator.type, parsedPrimaryAuthToken.primaryAuthenticator.id)
+        let userId = user._id
+
+        let sessionData = {
+            userId: userId,
+            tokenType: 'sessionToken'
+        }
+
+        let sessionToken = jwtHandler.generateToken(sessionData)
+        res.send({
+            token: sessionToken
+        })
+
+    })
 }

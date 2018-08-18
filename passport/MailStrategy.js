@@ -34,7 +34,8 @@ Strategy.prototype.authenticate = function(req, options) {
 
         this.success({
             id: parsedTokenMail,
-            avatar: avatar
+            avatar: avatar,
+            type: 'mailgun'
         })
     } else {
         let mail = req.body.mail
