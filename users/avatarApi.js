@@ -18,7 +18,8 @@ module.exports = (config) => {
                 Bucket: bucket,
                 Key: path + '/' + name + '.png',
                 Body: buffer,
-                ACL: 'public-read'
+                ACL: 'public-read',
+                ContentType: 'image/png'
             }, resolve)
         })
     }

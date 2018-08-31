@@ -16,9 +16,12 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
             users: userArray
         })
     })
-    router.get('/:userId', ensureUserIsAuthenticated, async (req, res) => {
+    router.get('/:userId', async (req, res) => {
         let userId = req.params.userId
         let user = await userApi.getUser(userId)
+
+        if (req.userId !== parseInt(req.params.userId))
+            user = user.profile
 
         res.send(user)
     })
