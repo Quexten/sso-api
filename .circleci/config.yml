@@ -23,10 +23,13 @@ jobs:
            - .circleci
   deploy:
     docker:
-      - image: circleci/node:10.9
+      - image: docker:17.05.0-ce-git
     working_directory: ~/repo
     steps:
       - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
       - run: docker login --username $docker_username --password $docker_password 
       - run: docker build -t quexten/sso:latest .
       - run: docker push quexten/sso:latest
