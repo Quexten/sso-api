@@ -3,8 +3,8 @@ let app = async () => {
     let config = require('./config/config.js')
 
     //Set up utilities
-    let database = require('./test/db/mockdb')()
-
+    //let database = require('./test/db/mockdb')()
+    let database = await require('./db/database')(config.mongodb.url)
     let jwtHandler = require('./authenticate/jwtHandler')(config.jwtHandler.secret)
     //Set up api's
     let avatarApi = await require('./users/avatarApi')(config.aws)

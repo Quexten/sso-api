@@ -20,7 +20,7 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
         let userId = req.params.userId
         let user = await userApi.getUser(userId)
 
-        if (req.userId !== parseInt(req.params.userId))
+        if ((req.userId !== parseInt(req.params.userId)) && req.userId !== req.params.userId )
             user = user.profile
 
         res.send(user)
