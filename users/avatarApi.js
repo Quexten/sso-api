@@ -8,6 +8,7 @@ module.exports = (config) => {
     let region = config.region
     let bucket = config.bucket
     let path = config.avatarPath
+    let avatarUrl = config.avatarUrl
 
     AWS.config.update({ accessKeyId: key, secretAccessKey: secret, region: region })
 
@@ -16,7 +17,7 @@ module.exports = (config) => {
         return await new Promise((resolve, reject) => {
             s3.upload({
                 Bucket: bucket,
-                Key: path + '/' + name + '.png',
+                Key: path + name + '.png',
                 Body: buffer,
                 ACL: 'public-read',
                 ContentType: 'image/png'
@@ -29,7 +30,7 @@ module.exports = (config) => {
         let image = await Jimp.read(url)
         image.resize(512, 512)
         await uploadAvatar(await image.getBufferAsync('image/png'), id + '_512')
-        return 'https://s3.eu-central-1.amazonaws.com/quexten/sso-dev/avatars/' + id + '_512.png'
+        return avatarUrl(path, id)
     }
 
     return {
