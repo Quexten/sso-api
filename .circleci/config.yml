@@ -20,16 +20,15 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
-           - .circleci
+           - ./node_modules
   deploy:
     docker:
       - image: docker:17.05.0-ce-git
     working_directory: ~/repo
     steps:
-      - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: /tmp/workspace
+          at: ~/repo
       - run: docker login --username $docker_username --password $docker_password 
       - run: docker build -t quexten/sso-api:latest .
       - run: docker push quexten/sso-api:latest
