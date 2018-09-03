@@ -20,7 +20,7 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
-           - ./node_modules
+           - ./
   deploy:
     docker:
       - image: docker:17.05.0-ce-git
