@@ -1,6 +1,6 @@
 let Jimp = require('jimp')
 let AWS = require('aws-sdk')
-let {promisify} = require("es6-promisify");
+let { promisify } = require("es6-promisify");
 
 module.exports = (config) => {
     let key = config.key
