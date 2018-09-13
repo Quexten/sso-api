@@ -1,8 +1,11 @@
-module.exports = async (database) => {
+export default class UserApi {
 
-    let createUser = async () => {
+    constructor (database) {
+        this.database = database
+    }
+
+    async createUser () {
         let user = {
-            _id: await database.getUniqueId(),
             authentication: {
                 primary: [],
                 secondary: [],
@@ -17,26 +20,21 @@ module.exports = async (database) => {
                 username: ''
             }
         }
-        await database.createUser(user)
+        let id = await this.database.createUser(user)
+        user._id = id
         return user
     }
 
-    let deleteUser = async (userId) => {
-        await database.deleteUser(userId)
+    async deleteUser (userId) {
+        await this.database.deleteUser(userId)
     }
 
-    let getUser = async (userId) => {
-        return await database.findUser(userId)
+    async getUser (userId) {
+        return await this.database.findUser(userId)
     }
 
-    let getUsers = async () => {
-        return await database.getUsers()
+    async getUsers () {
+        return await this.database.getUsers()
     }
 
-    return {
-        createUser,
-        deleteUser,
-        getUsers,
-        getUser
-    }
 }

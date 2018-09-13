@@ -1,25 +1,23 @@
-module.exports = async (database) => {
+export default class AuthenticationApi {
 
-    let addPrimaryAuthenticator = async (userId, authenticator) => {
-        let user = await database.findUser(userId)
+    constructor (database) {
+        this.database = database
+    }
+
+    async addPrimaryAuthenticator (userId, authenticator) {
+        let user = await this.database.findUser(userId)
         user.authentication.primary.push(authenticator)
-        database.updateUser(userId, user)
+        this.database.updateUser(userId, user)
     }
 
-    let removePrimaryAuthenticator = async (userId, authenticator) => {
-        let user = await database.findUser(userId)
+    async removePrimaryAuthenticator (userId, authenticator) {
+        let user = await this.database.findUser(userId)
         user.authentication.primary.filter((value) => { return value !== authenticator})
-        database.updateUser(userId, user)
+        this.database.updateUser(userId, user)
     }
 
-    let findUserByAuthenticator = async (authenticatorId, authenticatorType) => {
-        let user = await database.findUserByPrimaryAuthenticatorId(authenticatorType, authenticatorId)
-        return user
-    }
-
-    return {
-        addPrimaryAuthenticator,
-        removePrimaryAuthenticator
+    async findUserByAuthenticator (authenticatorId, authenticatorType) {
+        return await this.database.findUserByPrimaryAuthenticatorId(authenticatorType, authenticatorId)
     }
 
 }

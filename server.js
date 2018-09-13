@@ -1,9 +1,13 @@
 
 import SecondaryController from './authenticate/secondary/secondaryAuthenticator'
+import MongoDatabase from "./db/mongodbDatabase";
 
 let app = async () => {
     //Set up utilities
     //let database = require('./test/db/mockdb')()
+    let database = new MongoDatabase()
+    await database.connect('mongodb://localhost:27017/sso-api?retryWrites=true')
+
 
     let sessionHandler = require('./authenticate/sessionHandler')(database, app, jwtHandler, auditApi)
 
