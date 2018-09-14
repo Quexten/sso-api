@@ -1,56 +1,59 @@
+import express from 'express'
+import authenticationRouter from './routes/authenticate/router'
 
-import SecondaryController from './authenticate/secondary/secondaryAuthenticator'
-import MongoDatabase from "./db/mongodbDatabase";
+export default class Server {
 
-let app = async () => {
-    //Set up utilities
-    //let database = require('./test/db/mockdb')()
-    let database = new MongoDatabase()
-    await database.connect('mongodb://localhost:27017/sso-api?retryWrites=true')
+    constructor (config, jwtHandler, primaryAuthenticationMiddleware, restRouter) {
+        //Rest Signin Api
+        this.config = config
+        this.app = express()
 
+        //Middlewares
+        this.app.use((req, res, next) => {
+            req.sender = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+            res.userAgent = req.get('User-Agent')
+            next()
+        })
+        this.app.use(require('cors')({
+            origin: config.origin
+        }))
+        this.app.use(require('body-parser').urlencoded({ extended: true }))
+        this.app.use(require('body-parser').json())
+        this.app.use(require('cookie-parser')())
+        this.app.use(async (req, res, next) => {
+            //For security, all validation of authentication claims
+            //Like primary tokens, secondary tokens, or session tokens
+            //Are validated here, and stored inside the request, to
+            //minimize the amount of potentially vulnerable LoC
 
-    let sessionHandler = require('./authenticate/sessionHandler')(database, app, jwtHandler, auditApi)
+            let sessionToken = req.headers['session-token']
+            let primaryAuthenticationToken = req.body.primaryAuthenticationToken
+            let secondaryAuthenticationToken = req.body.secondaryAuthenticationToken
 
-    let authApi = await AuthApi(database)
-    require('./authenticate/strategyRegister')(database, app, config.authentication.primary)
-
-    //Rest Signin Api
-    let express = require('express')
-    let app = express()
-    app.use((req, res, next) => {
-        req.sender = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-
-        next()
-    })
-    app.use((req, res, next) => {
-        res.userAgent = req.get('User-Agent')
-
-        next()
-    })
-    //Middlewares
-    app.use(require('cors')({
-        origin: config.api.origin
-    }))
-    app.use(require('cookie-parser')())
-    app.use(require('body-parser').urlencoded({ extended: true }))
-    app.use(require('body-parser').json())
-    app.use((req, res, next) => {
-        let sessionToken = req.headers['session-token']
-        if (sessionToken !== null && jwtHandler.validateToken(sessionToken)) {
-            let session = jwtHandler.parseToken(sessionToken)
-            if (session.data.tokenType === 'sessionToken') {
-                req.userId = session.data.userId
+            if (sessionToken !== undefined && await jwtHandler.validateToken(sessionToken)) {
+                let session = await jwtHandler.parseToken(sessionToken)
+                if (session.data.tokenType === 'sessionToken') {
+                    req.userId = session.data.userId
+                }
             }
-        }
 
-        next()
+            if (primaryAuthenticationToken !== undefined && await jwtHandler.validateToken(primaryAuthenticationToken)) {
+                let primaryAuthenticator = await jwtHandler.parseToken(primaryAuthenticationToken)
+                if (primaryAuthenticator.data.tokenType === 'primaryAuthToken') {
+                    req.primaryAuthenticator = primaryAuthenticator.data.primaryAuthenticator
+                }
+            }
 
-    })
+            next()
+        })
 
-    app.use('/', require('./routes/router')(database, secondaryController, sessionHandler, profileApi, auditApi, userApi, jwtHandler, authApi))
-    //Routers
-    app.listen(config.api.port)
-    console.log('listening on port: ' + config.api.port)
+        this.app.use('/authenticators', authenticationRouter(primaryAuthenticationMiddleware))
+        this.app.use('/api', restRouter)
+    }
+
+    start () {
+        this.app.listen(this.config.port)
+        console.log(`listening on port: ${this.config.port}`)
+    }
 
 }
-app()

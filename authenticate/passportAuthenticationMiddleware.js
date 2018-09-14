@@ -1,12 +1,14 @@
-module.exports = async (database, app, config) => {
+import express from 'express'
+const router = express.Router()
+
+module.exports = (config, database, jwtHandler) => {
 
     //Import
     let passport = require('passport')
     let GoogleStrategy = require('passport-google-oauth20').Strategy
     let MailStrategy = require('../passport/MailStrategy')
     let SteamStrategy = require('passport-steam').Strategy
-    let DiscordStrategy = require('passport-discord').Strategy;
-    let jwt = require('jsonwebtoken')
+    let DiscordStrategy = require('passport-discord').Strategy
 
     let tokenForAuthenticator = async (authenticator, strategy) => {
         let secret = config.jwtSecret
@@ -21,7 +23,7 @@ module.exports = async (database, app, config) => {
             strategy: strategy,
             userId: userId
         }
-        return jwt.sign(token, secret)
+        return await jwtHandler.generateToken(token, secret)
     }
 
     //Register with passport
@@ -64,22 +66,30 @@ module.exports = async (database, app, config) => {
         }))
 
     //Register with express
-    app.use(passport.initialize());
-    app.get('/auth/google',
+    router.use(passport.initialize())
+    router.get('/google',
         (req, res, next) => {
             res.cookie('redirect', req.query.redirect)
             next()
         },
-        passport.authenticate('google', { scope: ['profile'], session: false }));
+        passport.authenticate('google', { scope: ['profile'], session: false }))
 
-    app.get('/auth/google/callback',
+    router.get('/google/callback',
         passport.authenticate('google', { failureRedirect: '/login', session:false }),
         async (req, res) => {
             let redirect = req.cookies.redirect
-            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
-        })
+            if (redirect !== "undefined") {
+                res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
+            } else {
+                let token = await tokenForAuthenticator(req.user, 'google')
+                res.status(200).send({
+                    token: token
+                })
+            }
+        }
+    )
 
-    app.get('/auth/steam',
+    router.get('/steam',
         (req, res, next) => {
             res.cookie('redirect', req.query.redirect)
             next()
@@ -87,35 +97,52 @@ module.exports = async (database, app, config) => {
         passport.authenticate('steam', { session: false }),
         (req, res) => {});
 
-    app.get('/auth/steam/return',
+    router.get('/steam/return',
         passport.authenticate('steam', { failureRedirect: '/login',  session: false  }),
         async (req, res) => {
             let redirect = req.cookies.redirect
-            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'steam'))
+            if (redirect !== "undefined") {
+                res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
+            } else {
+                let token = await tokenForAuthenticator(req.user, 'steam')
+                res.status(200).send({
+                    token: token
+                })
+            }
         })
 
-    app.post('/auth/mail',
+    router.post('/mail',
         passport.authenticate('mailgun', { session: false })
     )
-    app.get('/auth/mail/callback',
+
+    router.get('/mail/callback',
         passport.authenticate('mailgun', { session: false }),
         async (req, res) => {
             let redirect = req.cookies.redirect
             res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
         })
 
-    app.get('/auth/discord',
+    router.get('/discord',
         (req, res, next) => {
             res.cookie('redirect', req.query.redirect)
             next()
         },
         passport.authenticate('discord', { session: false }))
 
-    app.get('/auth/discord/callback', passport.authenticate('discord', {
+    router.get('/discord/callback', passport.authenticate('discord', {
         failureRedirect: '/',
         session: false
     }),  async (req, res) => {
         let redirect = req.cookies.redirect
-        res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
-    });
+        if (redirect !== "undefined") {
+            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
+        } else {
+            let token = await tokenForAuthenticator(req.user, 'discord')
+            res.status(200).send({
+                token: token
+            })
+        }
+    })
+
+    return router
 }

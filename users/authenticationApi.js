@@ -13,7 +13,12 @@ export default class AuthenticationApi {
     async removePrimaryAuthenticator (userId, authenticator) {
         let user = await this.database.findUser(userId)
         user.authentication.primary.filter((value) => { return value !== authenticator})
-        this.database.updateUser(userId, user)
+        await this.database.updateUser(userId, user)
+    }
+
+    async listPrimaryAuthenticators (userId) {
+        let user = await this.database.findUser(userId)
+        return user.authentication.primary
     }
 
     async findUserByAuthenticator (authenticatorId, authenticatorType) {

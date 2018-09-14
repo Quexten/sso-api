@@ -38,7 +38,7 @@ export default class MongoDatabase extends Database {
     }
 
     async getUsers (startIndex, endIndex) {
-        throw new Error('mongodbDatabase.getUsers is not implemented')
+        return await this.users.find({}).toArray()
     }
 
     async deleteUsers () {

@@ -5,18 +5,20 @@ let ensureUserIsAuthenticated = (req, res, next) => {
         res.send('error')
 }
 
+import { ensureIsOwner } from '../../security'
+
 module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
     const express = require('express')
-    const router = express.Router()
+    const router = express.Router({ mergeParams: true })
 
     router.get('/', async (req, res) => {
         let userArray = await userApi.getUsers()
-        userArray = userArray.map((user) => user.profile)
+        //userArray = userArray.map((user) => user.profile)
         res.send({
             users: userArray
         })
     })
-    router.get('/:userId', async (req, res) => {
+    router.get('/:userId', ensureIsOwner, async (req, res) => {
         let userId = req.params.userId
         let user = await userApi.getUser(userId)
 
@@ -25,7 +27,7 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
 
         res.send(user)
     })
-    router.delete('/:userId', ensureUserIsAuthenticated, async (req, res) => {
+    router.delete('/:userId', ensureIsOwner, async (req, res) => {
         let userId = req.params.userId
         await userApi.deleteUser(userId)
         res.send('ok')
@@ -54,9 +56,9 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
         res.send(user)
     })
 
-    router.use('/:userId/audit', ensureUserIsAuthenticated, require('./audit')(auditApi))
+    router.use('/:userId/audit', require('./audit')(auditApi))
     router.use("/:userId/profile", require("./profile")(profileApi))
-    router.use('/:userId/sessions', ensureUserIsAuthenticated, require('./sessions'))
+    router.use('/:userId/authenticators/', require('./authentication/router')(auditApi, userApi, authApi))
 
     return router
 }
