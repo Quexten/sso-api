@@ -12,7 +12,19 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
     const router = express.Router({ mergeParams: true })
 
     router.get('/', async (req, res) => {
+        if (req.userId === undefined) {
+            res.status(403).send('Missing user authentication.')
+            return
+        }
+
+        let requestingUser = await userApi.getUser(req.userId)
+        if (!requestingUser.profile.admin) {
+            res.status(403).send("User doesn't have permission to access this resource.")
+            return
+        }
+
         let userArray = await userApi.getUsers()
+
         //userArray = userArray.map((user) => user.profile)
         res.send({
             users: userArray
