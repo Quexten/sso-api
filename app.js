@@ -9,6 +9,7 @@ import AuthApi from './users/authenticationApi'
 import Server from './server'
 import passportAuthMiddleware from './authenticate/passportAuthenticationMiddleware'
 import apiRouter from './routes/api/router'
+import { sessionHandler } from './authenticate/sessionRouter'
 
 (async () => {
     //Set up apis & dependencies, and wire them together
@@ -21,9 +22,11 @@ import apiRouter from './routes/api/router'
     let auditApi = new AuditApi(database)
     let userApi = new UserApi(database)
     let authApi = new AuthApi(database)
+
     let primaryAuthMiddleware = passportAuthMiddleware(config.authentication.primary, database, jwtHandler)
     let restRouter = apiRouter(auditApi, userApi, profileApi, jwtHandler, authApi)
+    let sessionRouter = sessionHandler(database, jwtHandler, auditApi)
 
-    let server = new Server(config.api, jwtHandler, primaryAuthMiddleware, restRouter)
+    let server = new Server(config.api, jwtHandler, primaryAuthMiddleware, sessionRouter, restRouter)
     server.start()
 })()

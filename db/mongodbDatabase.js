@@ -33,7 +33,7 @@ export default class MongoDatabase extends Database {
     async findUserByPrimaryAuthenticatorId (authType, id) {
         return await this.users.findOne({
             'authentication.primary.id': id,
-            'authentication,primary.type': authType
+            'authentication.primary.type': authType
         })
     }
 

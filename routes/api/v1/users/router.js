@@ -1,10 +1,3 @@
-let ensureUserIsAuthenticated = (req, res, next) => {
-    if (req.userId === parseInt(req.params.userId))
-        next()
-    else
-        res.send('error')
-}
-
 import { ensureIsOwner } from '../../security'
 
 module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
@@ -42,18 +35,22 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
     router.delete('/:userId', ensureIsOwner, async (req, res) => {
         let userId = req.params.userId
         await userApi.deleteUser(userId)
-        res.send('ok')
+        res.status(204).send()
     })
     router.post('/new', async (req, res) => {
         let primaryAuthToken = req.body.token
 
         if (!jwtHandler.validateToken(primaryAuthToken)) {
-            res.send('error')
+            res.status(403).send({
+              error: 'Supplied authentication token is invalid.'
+            })
             return
         }
         let parsedToken = jwtHandler.parseToken(primaryAuthToken)
         if (parsedToken.tokenType !== 'primaryAuthToken') {
-            res.send('error')
+            res.status(403).send({
+                error: 'Supplied token has incorrect type.'
+            })
             return
         }
 
@@ -65,7 +62,7 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
             authenticatorType: parsedToken.strategy
         }, 'com.quexten.sso.addPrimaryAuthenticator', req.sender, res.userAgent)
         await profileApi.updateAvatar(user._id, parsedToken.primaryAuthenticator.avatar)
-        res.send(user)
+        res.status(201).send(user)
     })
 
     router.use('/:userId/audit', require('./audit')(auditApi))

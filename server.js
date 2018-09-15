@@ -3,7 +3,7 @@ import authenticationRouter from './routes/authenticate/router'
 
 export default class Server {
 
-    constructor (config, jwtHandler, primaryAuthenticationMiddleware, restRouter) {
+    constructor (config, jwtHandler, primaryAuthenticationMiddleware, sessionRouter, restRouter) {
         //Rest Signin Api
         this.config = config
         this.app = express()
@@ -47,7 +47,7 @@ export default class Server {
             next()
         })
 
-        this.app.use('/authenticators', authenticationRouter(primaryAuthenticationMiddleware))
+        this.app.use('/authenticate', authenticationRouter(primaryAuthenticationMiddleware, sessionRouter))
         this.app.use('/api', restRouter)
     }
 

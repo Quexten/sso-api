@@ -8,10 +8,18 @@ module.exports = function (auditApi, userApi, authApi) {
         try {
             let userId = req.params.userId
             let token = req.primaryAuthenticator
+            if (token == null) {
+                res.status(400).send({
+                    error: 'Missing token'
+                })
+                return
+            }
             await authApi.addPrimaryAuthenticator(userId, token)
-            res.send('ok')
+            res.status(201).send(token)
         } catch (err) {
-            res.send('error')
+            res.status(403).send({
+                error: 'User lacks permissions'
+            })
         }
     })
 
@@ -22,8 +30,7 @@ module.exports = function (auditApi, userApi, authApi) {
     router.get('/:primaryAuthenticatorId', ensureIsOwner, async (req, res) => {
         try {
             let userId = req.params.userId
-
-            res.send(audit)
+            res.send(userId)
         } catch (err) {
             res.error('error')
         }
@@ -32,8 +39,7 @@ module.exports = function (auditApi, userApi, authApi) {
     router.delete('/:primaryAuthenticatorId', ensureIsOwner, async (req, res) => {
         try {
             let userId = req.params.userId
-
-            res.send(audit)
+            res.send(userId)
         } catch (err) {
             res.error('error')
         }

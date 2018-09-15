@@ -10,7 +10,9 @@ module.exports = function (auditApi) {
             let audit = await auditApi.listEvents(userId)
             res.send(audit)
         } catch (err) {
-            res.send('error')
+            res.status(500).send({
+                error: "Error getting events."
+            })
         }
     })
 

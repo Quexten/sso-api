@@ -7,9 +7,11 @@ module.exports = function (profileApi) {
     router.get('/', async (req, res) => {
         try {
             let profile = await profileApi.get(req.params.userId)
-            res.send(profile)
+            res.status(200).send(profile)
         } catch (err) {
-            res.send('error: could not find profile')
+            res.status(404).send({
+                error: 'No user found under the supplied userId.'
+            })
         }
     })
 
@@ -21,9 +23,11 @@ module.exports = function (profileApi) {
             let username = requestBody.username
             let profile = await profileApi.updateUsername(userId, username)
 
-            res.send(profile)
+            res.status(200).send(profile)
         } catch (err) {
-            res.send('error: could not find profile')
+            res.status(404).send({
+                error: 'No user found under the supplied userId'
+            })
         }
     })
 
