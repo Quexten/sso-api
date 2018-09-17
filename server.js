@@ -11,7 +11,7 @@ export default class Server {
         //Middlewares
         this.app.use((req, res, next) => {
             req.sender = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-            res.userAgent = req.get('User-Agent')
+            req.userAgent = req.get('User-Agent')
             next()
         })
         this.app.use(require('cors')({

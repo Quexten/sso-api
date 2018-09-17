@@ -5,6 +5,7 @@ export default class AuthenticationApi {
     }
 
     async addPrimaryAuthenticator (userId, authenticator) {
+        authenticator._id = await this.database.getUniqueId()
         let user = await this.database.findUser(userId)
         user.authentication.primary.push(authenticator)
         this.database.updateUser(userId, user)

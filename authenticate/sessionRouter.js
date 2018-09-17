@@ -14,6 +14,8 @@ export function sessionHandler (database, jwtHandler, auditApi) {
             tokenType: 'sessionToken'
         }
 
+        await auditApi.pushEvent (userId, {}, 'com.quexten.sso.signIn', req.sender, req.userAgent)
+
         let sessionToken = await jwtHandler.generateToken(sessionData)
         res.send({
             token: sessionToken

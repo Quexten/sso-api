@@ -8,6 +8,10 @@ export default class MongoDatabase extends Database {
         this.users = null
     }
 
+    async getUniqueId() {
+        return new ObjectId()
+    }
+
     async connect (url) {
         let mongo = await MongoClient.connect(url)
         let database = mongo.db('sso-api')

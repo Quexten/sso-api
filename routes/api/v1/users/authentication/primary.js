@@ -14,7 +14,18 @@ module.exports = function (auditApi, userApi, authApi) {
                 })
                 return
             }
+
+            //Test if authenticator is already registered
+            let user = await authApi.findUserByAuthenticator(token.id, token.type)
+            if (user != null) {
+                res.status(400).send({
+                    error: 'Authenticator already registered.'
+                })
+                return
+            }
+
             await authApi.addPrimaryAuthenticator(userId, token)
+            await auditApi.pushEvent (userId, {}, 'com.quexten.sso.addPrimaryAuthenticator', req.sender, req.userAgent)
             res.status(201).send(token)
         } catch (err) {
             res.status(403).send({
