@@ -1,17 +1,21 @@
+import {ensureIsOwner} from "../../security";
+
 module.exports = function (profileApi) {
     const express = require('express')
     const router = express.Router({ mergeParams: true })
 
     router.get('/', async (req, res) => {
         try {
-            let profile = await profileApi.get(parseInt(req.params.userId))
-            res.send(profile)
+            let profile = await profileApi.get(req.params.userId)
+            res.status(200).send(profile)
         } catch (err) {
-            res.send('error: could not find profile')
+            res.status(404).send({
+                error: 'No user found under the supplied userId.'
+            })
         }
     })
 
-    router.post('/', async (req, res) => {
+    router.post('/', ensureIsOwner, async (req, res) => {
         try {
             let userId = req.params.userId
             let requestBody = req.body
@@ -19,9 +23,11 @@ module.exports = function (profileApi) {
             let username = requestBody.username
             let profile = await profileApi.updateUsername(userId, username)
 
-            res.send(profile)
+            res.status(200).send(profile)
         } catch (err) {
-            res.send('error: could not find profile')
+            res.status(404).send({
+                error: 'No user found under the supplied userId'
+            })
         }
     })
 

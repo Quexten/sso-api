@@ -1,13 +1,17 @@
-module.exports = async (database) => {
+export default class AuditApi {
 
-    let listEvents = async (userId) => {
-        let user = await database.findUser(userId)
-        return user.audit
+    constructor (database) {
+        this.database = database
     }
 
-    let pushEvent = async (userId, data, eventType, origin, userAgent) => {
+    async listEvents (userId) {
+        let user = await this.database.findUser(userId)
+        return user.audit.events
+    }
+
+    async pushEvent (userId, data, eventType, origin, userAgent) {
         let event = {
-            id: await database.getUniqueId(),
+            _id: await this.database.getUniqueId(),
             time: new Date(Date.now()),
             origin: origin,
             type: eventType,
@@ -15,15 +19,11 @@ module.exports = async (database) => {
             userAgent: userAgent
         }
 
-        let user = await database.findUser(userId)
+        let user = await this.database.findUser(userId)
         user.audit.events.push(event)
-        await database.updateUser(userId, user)
+        await this.database.updateUser(userId, user)
 
-        return user
+        return event._id
     }
 
-    return {
-        pushEvent: pushEvent,
-        listEvents: listEvents
-    }
 }

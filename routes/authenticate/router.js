@@ -1,9 +1,9 @@
-module.exports = (database, primaryAuthenticator, secondaryAuthenticator, sessionHandler) => {
+module.exports = (primaryAuthMiddleware, sessionRouter) => {
     const express = require('express')
     const router = express.Router()
 
-    router.use("/primary", require("./primary/router")(database, primaryAuthenticator))
-
+    router.use("/primary", require("./primary/router")(primaryAuthMiddleware))
+    router.use('/exchange', sessionRouter)
 
     return router
 }

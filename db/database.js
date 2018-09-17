@@ -1,45 +1,24 @@
-module.exports = async (url) => {
-    let { MongoClient, ObjectId } = require('mongodb')
+export default class Database {
 
-    let mongo = await MongoClient.connect(url)
-    let database = mongo.db('sso-api')
-    let users = database.collection('users')
-
-    let createUser = (user) => users.insertOne(user)
-
-    let findUser = (id) => users.findOne({ _id: ObjectId(id) })
-
-    let updateUser = (id, user) => users.updateOne({ _id: ObjectId(id)}, { $set: user })
-
-    let deleteUser = (id) => users.removeOne({ _id: ObjectId(id) })
-
-    let findUserByPrimaryAuthenticatorId = async (authType, id) => {
-        return users.findOne({
-            'authentication.primary.id': id,
-            'authentication.primary.type': authType
-        })
+    async createUser(user) {
     }
 
-    let findUserBySecondaryAuthenticatorId = async (authType, id) => {
-        throw new Error('Finding users by the secondary authenticator is not implemented for mongodb driver')
+    async findUser(id) {
     }
 
-    let getUsers = async () => {
-        throw new Error('Getting all users is not implemented for mongodb driver')
+    async updateUser(id, user) {
     }
 
-    let getUniqueId = async () => {
-        return new ObjectId(Date.now())
+    async deleteUser(id) {
     }
 
-    return {
-        createUser: createUser,
-        findUser: findUser,
-        updateUser: updateUser,
-        deleteUser: deleteUser,
-        findUserByPrimaryAuthenticatorId: findUserByPrimaryAuthenticatorId,
-        findUserBySecondaryAuthenticatorId: findUserBySecondaryAuthenticatorId,
-        getUniqueId: getUniqueId,
-        getUsers: getUsers
+    async findUserByPrimaryAuthenticatorId (authType, id) {
     }
+
+    async getUsers (startIndex, endIndex) {
+    }
+
+    async deleteUsers () {
+    }
+
 }

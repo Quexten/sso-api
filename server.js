@@ -1,71 +1,59 @@
-let app = async () => {
-    //Load config
-    let config = require('./config/config.js')
+import express from 'express'
+import authenticationRouter from './routes/authenticate/router'
 
-    //Set up utilities
-    //let database = require('./test/db/mockdb')()
-    let database = await require('./db/database')(config.mongodb.url)
-    let jwtHandler = require('./authenticate/jwtHandler')(config.jwtHandler.secret)
-    //Set up api's
-    let avatarApi = await require('./users/avatarApi')(config.aws)
+export default class Server {
 
-    let profileApi = await require('./users/profileApi')(database, avatarApi)
-    let auditApi = await require('./users/auditApi')(database)
-    let userApi = await require('./users/userApi')(database)
-    let authApi = await require('./users/authenticationApi')(database)
+    constructor (config, jwtHandler, primaryAuthenticationMiddleware, sessionRouter, restRouter) {
+        //Rest Signin Api
+        this.config = config
+        this.app = express()
 
+        //Middlewares
+        this.app.use((req, res, next) => {
+            req.sender = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+            req.userAgent = req.get('User-Agent')
+            next()
+        })
+        this.app.use(require('cors')({
+            origin: config.origin
+        }))
+        this.app.use(require('body-parser').urlencoded({ extended: true }))
+        this.app.use(require('body-parser').json())
+        this.app.use(require('cookie-parser')())
+        this.app.use(async (req, res, next) => {
+            //For security, all validation of authentication claims
+            //Like primary tokens, secondary tokens, or session tokens
+            //Are validated here, and stored inside the request, to
+            //minimize the amount of potentially vulnerable LoC
 
-    //Set up authentication
-    //Primary
-    //let primaryController = require('./authenticate/primary/controller')(database, jwtHandler)
+            let sessionToken = req.headers['session-token']
+            let primaryAuthenticationToken = req.body.primaryAuthenticationToken
+            let secondaryAuthenticationToken = req.body.secondaryAuthenticationToken
 
-   // let MailAuthenticator = require('./authenticate/primary/mailAuthenticator')
-   // primaryController.registerAuthenticator('mail', new MailAuthenticator(config.primary.mailgun, jwtHandler) )
+            if (sessionToken !== undefined && await jwtHandler.validateToken(sessionToken)) {
+                let session = await jwtHandler.parseToken(sessionToken)
+                if (session.data.tokenType === 'sessionToken') {
+                    req.userId = session.data.userId
+                }
+            }
 
-    //Secondary
-    let secondaryController = require('./authenticate/secondary/secondaryAuthenticator', config.secondary)
+            if (primaryAuthenticationToken !== undefined && await jwtHandler.validateToken(primaryAuthenticationToken)) {
+                let primaryAuthenticator = await jwtHandler.parseToken(primaryAuthenticationToken)
+                if (primaryAuthenticator.data.tokenType === 'primaryAuthToken') {
+                    req.primaryAuthenticator = primaryAuthenticator.data.primaryAuthenticator
+                }
+            }
 
+            next()
+        })
 
-    //Rest Signin Api
-    let express = require('express')
-    let app = express()
+        this.app.use('/authenticate', authenticationRouter(primaryAuthenticationMiddleware, sessionRouter))
+        this.app.use('/api', restRouter)
+    }
 
-    app.use((req, res, next) => {
-        req.sender = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-        next()
-    })
-
-    app.use((req, res, next) => {
-        res.userAgent = req.get('User-Agent')
-        next()
-    })
-
-    //Middlewares
-    app.use(require('cors')({
-        origin: config.api.origin
-    }))
-    app.use(require('cookie-parser')())
-    app.use(require('body-parser').urlencoded({ extended: true }))
-    app.use(require('body-parser').json())
-    app.use((req, res, next) => {
-        let sessionToken = req.headers['session-token']
-        if (sessionToken !== null && jwtHandler.validateToken(sessionToken)) {
-            let session = jwtHandler.parseToken(sessionToken)
-            if (session.data.tokenType === 'sessionToken')
-                req.userId = session.data.userId
-        }
-        next()
-    })
-
-    let sessionHandler = require('./authenticate/sessionHandler')(database, app, jwtHandler, auditApi)
-
-    app.use('/', require('./routes/router')(database, secondaryController, sessionHandler, profileApi, auditApi, userApi, jwtHandler, authApi))
-
-    //Routers
-    app.listen(config.api.port)
-    console.log('listening on port: ' + config.api.port)
-    //require('./users/imageImporter')(config.aws).setUserImage(54555, 'https://s.gravatar.com/avatar/b2e0cbf930a9ccfb0494b56f5d8f9a1b?s=512')
-    require('./authenticate/strategyRegister')(database, app, config.authentication.primary)
+    start () {
+        this.app.listen(this.config.port)
+        console.log(`listening on port: ${this.config.port}`)
+    }
 
 }
-app()
