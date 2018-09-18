@@ -1,4 +1,4 @@
-import config from './config/config'
+import fs from 'fs'
 import Database from './db/mongodbDatabase'
 import JwtHandler from './authenticate/jwtHandler'
 import AvatarApi from './users/s3AvatarApi'
@@ -12,6 +12,12 @@ import apiRouter from './routes/api/router'
 import { sessionHandler } from './authenticate/sessionRouter'
 
 (async () => {
+    let config;
+    if (process.env.config == null) {
+      config = JSON.parse(fs.readFileSync('./config/config.json', 'utf8'))
+    } else {
+      config = JSON.parse(process.env.config)
+    }
     //Set up apis & dependencies, and wire them together
     let database = new Database(config.mongodb.url)
     await database.connect(config.mongodb.url)
