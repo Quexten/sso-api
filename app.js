@@ -35,4 +35,5 @@ import { sessionHandler } from './authenticate/sessionRouter'
 
     let server = new Server(config.api, jwtHandler, primaryAuthMiddleware, sessionRouter, restRouter)
     server.start()
+
 })()

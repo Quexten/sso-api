@@ -27,7 +27,11 @@ export default class MongoDatabase extends Database {
     }
 
     async updateUser(id, user) {
-        await this.users.updateOne({ _id: ObjectId(id)}, { $set: user })
+        try {
+            await this.users.updateOne({_id: ObjectId(id)}, {$set: user})
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async deleteUser(id) {

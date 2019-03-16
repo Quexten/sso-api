@@ -32,15 +32,15 @@ export default class Server {
 
             if (sessionToken !== undefined && await jwtHandler.validateToken(sessionToken)) {
                 let session = await jwtHandler.parseToken(sessionToken)
-                if (session.data.tokenType === 'sessionToken') {
-                    req.userId = session.data.userId
+                if (session.tokenType === 'sessionToken') {
+                    req.userId = session.userId
                 }
             }
 
             if (primaryAuthenticationToken !== undefined && await jwtHandler.validateToken(primaryAuthenticationToken)) {
                 let primaryAuthenticator = await jwtHandler.parseToken(primaryAuthenticationToken)
-                if (primaryAuthenticator.data.tokenType === 'primaryAuthToken') {
-                    req.primaryAuthenticator = primaryAuthenticator.data.primaryAuthenticator
+                if (primaryAuthenticator.tokenType === 'primaryAuthToken') {
+                    req.primaryAuthenticator = primaryAuthenticator.primaryAuthenticator
                 }
             }
 

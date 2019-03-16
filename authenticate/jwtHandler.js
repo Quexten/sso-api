@@ -23,7 +23,7 @@ export default class JwtHandler {
     }
 
     async parseToken (token) {
-        return jwt.decode(token)
+        return (await jwt.decode(token)).data
     }
 
 }

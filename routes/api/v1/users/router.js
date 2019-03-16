@@ -46,7 +46,7 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
             })
             return
         }
-        let parsedToken = jwtHandler.parseToken(primaryAuthToken)
+        let parsedToken = await jwtHandler.parseToken(primaryAuthToken)
         if (parsedToken.tokenType !== 'primaryAuthToken') {
             res.status(403).send({
                 error: 'Supplied token has incorrect type.'
@@ -62,6 +62,7 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
             authenticatorType: parsedToken.strategy
         }, 'com.quexten.sso.addPrimaryAuthenticator', req.sender, res.userAgent)
         await profileApi.updateAvatar(user._id, parsedToken.primaryAuthenticator.avatar)
+        user = await userApi.getUser(user._id)
         res.status(201).send(user)
     })
 

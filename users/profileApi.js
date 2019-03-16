@@ -13,12 +13,12 @@ export default class ProfileApi {
     async update (id, profile) {
         let user = await this.database.findUser(id)
         user.profile = profile
-        await this.database.updateUser(id, user)
+        await this.database.updateUser(id,  user)
         return user
     }
 
     async updateUsername (id, username) {
-        let profile = await get(id)
+        let profile = await this.get(id)
         profile.username = username
         await this.update(id, profile)
         return profile
@@ -26,7 +26,7 @@ export default class ProfileApi {
 
     async updateAvatar (id, url) {
         let avatarUrl = await this.avatarApi.uploadUserImage(id, url)
-        let profile = await get(id)
+        let profile = await this.get(id)
         profile.avatar = avatarUrl
         await this.update(id, profile)
         return profile

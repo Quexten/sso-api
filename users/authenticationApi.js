@@ -8,7 +8,7 @@ export default class AuthenticationApi {
         authenticator._id = await this.database.getUniqueId()
         let user = await this.database.findUser(userId)
         user.authentication.primary.push(authenticator)
-        this.database.updateUser(userId, user)
+        await this.database.updateUser(userId, user)
     }
 
     async removePrimaryAuthenticator (userId, authenticator) {
