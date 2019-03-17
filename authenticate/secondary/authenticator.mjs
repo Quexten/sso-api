@@ -24,11 +24,11 @@ module.exports = (database, jwtHandler) => {
             try {
                 let data = authenticators[authenticatorType].verify(data)
 
-                user.auth.secondary.push({
+                /*user.auth.secondary.push({
                     authenticatorId: authenticatorType,
                     data: data,
                     _id: await database.
-                })
+                })*/
             } catch (err) {
                 console.log(err)
             }

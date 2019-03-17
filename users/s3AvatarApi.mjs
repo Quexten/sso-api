@@ -30,6 +30,6 @@ export default class S3AvatarApi {
         let image = await Jimp.read(url)
         image.resize(512, 512)
         await this.uploadAvatar(await image.getBufferAsync('image/png'), id + '_512')
-        return 'https://s3.eu-central-1.amazonaws.com/quexten/sso-dev/avatars/' + id + '_512.png'
+        return 'https://s3.quexten.com/sso/avatars/' + id + '_512.png'
     }
 }

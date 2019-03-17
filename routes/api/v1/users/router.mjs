@@ -1,7 +1,10 @@
 import { ensureIsOwner } from '../../security'
+import express from 'express'
+import auditRoute from './audit'
+import profileRoute from './profile'
+import authenticationRoute from './authentication/router'
 
-module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
-    const express = require('express')
+export default function (auditApi, userApi, profileApi, jwtHandler, authApi) {
     const router = express.Router({ mergeParams: true })
 
     router.get('/', async (req, res) => {
@@ -66,9 +69,9 @@ module.exports = function (auditApi, userApi, profileApi, jwtHandler, authApi) {
         res.status(201).send(user)
     })
 
-    router.use('/:userId/audit', require('./audit')(auditApi))
-    router.use("/:userId/profile", require("./profile")(profileApi))
-    router.use('/:userId/authenticators/', require('./authentication/router')(auditApi, userApi, authApi))
+    router.use('/:userId/audit', auditRoute(auditApi))
+    router.use("/:userId/profile", profileRoute(profileApi))
+    router.use('/:userId/authenticators/', authenticationRoute(auditApi, userApi, authApi))
 
     return router
 }

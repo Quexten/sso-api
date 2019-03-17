@@ -1,7 +1,7 @@
 import {ensureIsOwner} from "../../../security";
+import express from 'express'
 
-module.exports = function (auditApi, userApi, authApi) {
-    const express = require('express')
+export default function (auditApi, userApi, authApi) {
     const router = express.Router({ mergeParams: true })
 
     router.post('/new', ensureIsOwner, async (req, res) => {

@@ -1,5 +1,6 @@
 import Database from './database'
-import { MongoClient, ObjectId } from 'mongodb'
+import mongodb from 'mongodb'
+const { MongoClient, ObjectId } = mongodb
 
 export default class MongoDatabase extends Database {
 

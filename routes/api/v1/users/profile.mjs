@@ -1,7 +1,7 @@
 import {ensureIsOwner} from "../../security";
+import express from 'express'
 
-module.exports = function (profileApi) {
-    const express = require('express')
+export default function (profileApi) {
     const router = express.Router({ mergeParams: true })
 
     router.get('/', async (req, res) => {

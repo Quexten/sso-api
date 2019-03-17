@@ -1,9 +1,24 @@
-let express = require('express')
+import express from 'express'
 let router = express.Router()
 
-module.exports = function(database, secondaryAuthenticator) {
+import fido2 from '../../../authenticate/secondary/fido2'
+fido2()
 
-    router.post('/:authenticator', (req, res) => {
+export default function(secondaryAuthenticator) {
+
+    router.get("/totp/new", async (req, res) => {
+        let test = await secondaryAuthenticator.create("totp")
+        res.send(test)
+    })
+    router.get("/codes/new", async (req, res) => {
+        let codes = await secondaryAuthenticator.create("codes")
+        res.send(codes)
+    })
+    router.get("/webauthn/register", async (req, res) => {
+        let result = await fido2()
+        res.send("aoeu")
+    })
+    /*router.post('/:authenticator', (req, res) => {
         let authenticatorType = req.params.authenticator
         let authenticatorData = req.body
         secondaryAuthenticator.requestAuthentication(authenticatorType, authenticatorData)
@@ -25,7 +40,7 @@ module.exports = function(database, secondaryAuthenticator) {
                 error: 'Could not authenticate'
             })
         }
-    })
+    })*/
 
     return router
 }

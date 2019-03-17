@@ -1,9 +1,14 @@
 import express from 'express'
 import authenticationRouter from './routes/authenticate/router'
+import https from 'https'
+import fs from 'fs'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 
 export default class Server {
 
-    constructor (config, jwtHandler, primaryAuthenticationMiddleware, sessionRouter, restRouter) {
+    constructor (config, jwtHandler, primaryAuthenticationMiddleware, sessionRouter, restRouter, secondaryAuthenticator) {
         //Rest Signin Api
         this.config = config
         this.app = express()
@@ -14,12 +19,12 @@ export default class Server {
             req.userAgent = req.get('User-Agent')
             next()
         })
-        this.app.use(require('cors')({
+        this.app.use(cors({
             origin: config.origin
         }))
-        this.app.use(require('body-parser').urlencoded({ extended: true }))
-        this.app.use(require('body-parser').json())
-        this.app.use(require('cookie-parser')())
+        this.app.use(bodyParser.urlencoded({ extended: true }))
+        this.app.use(bodyParser.json())
+        this.app.use(cookieParser())
         this.app.use(async (req, res, next) => {
             //For security, all validation of authentication claims
             //Like primary tokens, secondary tokens, or session tokens
@@ -47,12 +52,16 @@ export default class Server {
             next()
         })
 
-        this.app.use('/authenticate', authenticationRouter(primaryAuthenticationMiddleware, sessionRouter))
+        this.app.use('/authenticate', authenticationRouter(primaryAuthenticationMiddleware, sessionRouter, secondaryAuthenticator))
         this.app.use('/api', restRouter)
     }
 
     start () {
-        this.app.listen(this.config.port)
+        console.log("starting https")
+        https.createServer({
+            key: fs.readFileSync('./key.pem'),
+            cert: fs.readFileSync('./cert.pem')
+        } ,this.app).listen(this.config.port)
         console.log(`listening on port: ${this.config.port}`)
     }
 

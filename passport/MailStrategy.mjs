@@ -1,13 +1,14 @@
-let passport = require('passport-strategy')
-let util = require('util')
+import passport from 'passport-strategy'
+import util from 'util'
+import mailgunModule from './mailgun'
+import fs from 'fs'
+let loginTemplate = fs.readFileSync('./passport/emailLogin.html', 'utf8')
+import jwt from 'jsonwebtoken'
+import gravatar from 'gravatar'
 
-let mailgunModule = require('./mailgun.js')
-let loginTemplate = require('fs').readFileSync('./passport/emailLogin.html', 'utf8')
 let makeLoginHtml = (link) => {
     return loginTemplate.replace(/REPLACELINK/g, link)
 }
-let jwt = require('jsonwebtoken')
-let gravatar = require('gravatar')
 
 function Strategy(options) {
     this.name = 'mailgun'
@@ -50,4 +51,4 @@ Strategy.prototype.authenticate = function(req, options) {
     }
 }
 
-module.exports = Strategy;
+export default Strategy

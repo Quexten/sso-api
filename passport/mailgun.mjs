@@ -1,5 +1,7 @@
-module.exports = function (apiKey, domain, sender) {
-    let mailgun = require('mailgun-js')({
+import mailgunjs from 'mailgun-js'
+
+export default function (apiKey, domain, sender) {
+    let mailgun = mailgunjs({
         apiKey: apiKey,
         domain: domain
     })

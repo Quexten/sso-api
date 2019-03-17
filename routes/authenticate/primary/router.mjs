@@ -1,7 +1,7 @@
 import express from 'express'
 let router = express.Router()
 
-module.exports = (authenticationMiddleware) => {
+export default (authenticationMiddleware) => {
     router.use('/', authenticationMiddleware)
     return router
 }

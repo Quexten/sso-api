@@ -13,7 +13,7 @@ class TotpAuthenticator extends SecondaryAuthenticator {
 
     async create () {
         let key = await generateKey(100)
-        let qr = await generateQr('Quexten', 'Quexten\nQuexten', key)
+        let qr = await generateQr('Quexten-SSO', 'Quexten-SSO', key)
 
         return {
             id: 'totp',

@@ -1,14 +1,16 @@
 import express from 'express'
 const router = express.Router()
+import passport from 'passport'
+import googleauth from 'passport-google-oauth20'
+const GoogleStrategy = googleauth.Strategy
+import discordauth from 'passport-discord'
+const DiscordStrategy = discordauth.Strategy
+import steamauth from 'passport-steam'
+const SteamStrategy = steamauth.Strategy
+import MailStrategy from '../passport/MailStrategy'
 
-module.exports = (config, database, jwtHandler) => {
 
-    //Import
-    let passport = require('passport')
-    let GoogleStrategy = require('passport-google-oauth20').Strategy
-    let MailStrategy = require('../passport/MailStrategy')
-    let SteamStrategy = require('passport-steam').Strategy
-    let DiscordStrategy = require('passport-discord').Strategy
+export default (config, database, jwtHandler) => {
 
     let tokenForAuthenticator = async (authenticator, strategy) => {
         let secret = config.jwtSecret
@@ -32,7 +34,8 @@ module.exports = (config, database, jwtHandler) => {
     passport.use(new GoogleStrategy(config.google,
         function(accessToken, refreshToken, profile, done) {
             let avatar = profile.photos[0].value
-            avatar = avatar.substr(0, avatar.length - 6)
+            avatar = avatar.substr(0, avatar.length)
+            avatar = avatar + "?size=512"
             done(null, {
                 id: profile.id,
                 avatar: avatar,
@@ -102,7 +105,7 @@ module.exports = (config, database, jwtHandler) => {
         async (req, res) => {
             let redirect = req.cookies.redirect
             if (redirect !== "undefined") {
-                res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
+                res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'steam'))
             } else {
                 let token = await tokenForAuthenticator(req.user, 'steam')
                 res.status(200).send({
@@ -119,7 +122,7 @@ module.exports = (config, database, jwtHandler) => {
         passport.authenticate('mailgun', { session: false }),
         async (req, res) => {
             let redirect = req.cookies.redirect
-            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
+            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'mailgun'))
         })
 
     router.get('/discord',
@@ -135,7 +138,7 @@ module.exports = (config, database, jwtHandler) => {
     }),  async (req, res) => {
         let redirect = req.cookies.redirect
         if (redirect !== "undefined") {
-            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'google'))
+            res.redirect(redirect + "?token=" + await tokenForAuthenticator(req.user, 'discord'))
         } else {
             let token = await tokenForAuthenticator(req.user, 'discord')
             res.status(200).send({

@@ -1,4 +1,4 @@
-module.exports = class SecondaryAuthenticator {
+export default class SecondaryAuthenticator {
 
     constructor() {
     }
