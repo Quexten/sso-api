@@ -3,4 +3,6 @@
 /.next
 *.idea*
 /config
+/cert.pem
+/key.pem
 
